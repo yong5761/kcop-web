@@ -1,0 +1,129 @@
+.switch {
+  box-sizing: border-box;
+}
+ 
+input[switch] {
+  display: none;
+}
+input[switch] + label {
+box-sizing: border-box;
+  font-size: 1em;
+  line-height: 1;
+  width: 4rem;
+  height: 2rem;
+  background-color: #ddd;
+  background-image: none;
+  border-radius: 2rem;
+  padding: 0.16667rem;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+ font-weight:bold;
+  position: relative;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2) inset;
+ 
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+input[switch] + label:before {
+  /* Label */
+  box-sizing: border-box;
+  text-transform: uppercase;
+  color: #b7b7b7;
+  content: attr(data-off-label);
+  display: block;
+  font-family: inherit;
+  font-family: FontAwesome, inherit;
+  font-weight: 500;
+  font-size: 0.7rem;
+  line-height: 1.74rem;
+  position: absolute;
+  right: 0.21667rem;
+  margin: 0.21667rem;
+  top: 0;
+  text-align: center;
+  min-width: 1.66667rem;
+  overflow: hidden;
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+input[switch] + label:after {
+box-sizing: border-box;
+  /* Slider */
+  content: '';
+  position: absolute;
+  left: 0.16667rem;
+  background:url('../img/common/music_icon.png') no-repeat center;
+  background-position:7px;
+  background-color: #f7f7f7;
+  box-shadow: none;
+  border-radius: 2rem;
+  height: 1.66667rem;
+  width: 1.66667rem;
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+input[switch]:checked + label {
+box-sizing: border-box;
+  background-color: lightblue;
+  background-image: -webkit-linear-gradient(rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.2));
+  background-image: linear-gradient(rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.2));
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3) inset;
+}
+input[switch]:checked + label:before {
+box-sizing: border-box;
+  color: #fff;
+  content: attr(data-on-label);
+  right: auto;
+  left: 0.21667rem;
+}
+input[switch]:checked + label:after {
+box-sizing: border-box;
+  left: 2.16667rem;
+  background-color: #f7f7f7;
+  box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+input[switch="bool"] + label {
+box-sizing: border-box;
+  background-color: #ee6562;
+}
+input[switch="bool"] + label:before {
+box-sizing: border-box;
+  color: #fff !important;
+}
+input[switch="bool"]:checked + label {
+box-sizing: border-box;
+  background-color: #BCE954;
+}
+input[switch="bool"]:checked + label:before {
+box-sizing: border-box;
+  color: #fff !important;
+}
+
+input[switch="default"]:checked + label {
+box-sizing: border-box;
+  background-color: #a2a2a2;
+}
+input[switch="default"]:checked + label:before {
+box-sizing: border-box;
+  color: #fff !important;
+}
+
+input[switch="success"]:checked + label {
+box-sizing: border-box;
+  background-color: #BCE954;
+}
+input[switch="success"]:checked + label:before {
+box-sizing: border-box;
+  color: #fff !important;
+}
+
+input[switch="warning"]:checked + label {
+box-sizing: border-box;
+  background-color: gold;
+}
+input[switch="warning"]:checked + label:before {
+box-sizing: border-box;
+  color: #fff !important;
+}

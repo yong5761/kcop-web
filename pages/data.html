@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>멀티벨 관리시스템</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link href="../common/css/basic.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/board.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/switch.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/default.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/common.css" type="text/css" rel="stylesheet">
+  <script src="../common/js/jquery-1.7.1.min.js"></script>
+</head>
+<body>
+
+  <div id="wrap">
+
+    <div id="top">
+      <table>
+        <tbody>
+          <tr>
+            <td style="float:left;" id="topDate"></td>
+            <td style="float:right;">
+              <div class="switch">
+                <input type="checkbox" id="switch2" switch="default">
+                <label for="switch2" data-on-label="ON" data-off-label="OFF"></label>
+              </div>
+            </td>
+            <td style="float:right;">
+              <a href="../login.html" title="">
+                <img src="../common/img/common/logout_btn.png" alt="로그아웃" style="margin-top:2px;"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                <span style="display:none;">로그아웃</span>
+              </a>
+            </td>
+            <td style="float:right;">
+              <img src="../common/img/common/top_icon.png" alt="" style="margin-top:5px;"
+                   onerror="this.style.display='none';">
+              &nbsp;<a href="#" onclick="alert('프로그래머 기능 준비 중');return false;" target="space">프로그래머</a>
+            </td>
+            <td style="float:right;">
+              <a href="#" onclick="alert('공지사항 기능 준비 중');return false;" target="space">공지사항 &nbsp;
+                <span class="no" style="float:right;">0</span>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="content2">
+
+      <div id="nav">
+        <center>
+          <img src="../common/img/common/logo.gif" alt=""
+               style="padding-top:20px;padding-bottom:20px;"
+               onerror="this.style.display='none';">
+          <br><span style="font-size:10px;font-weight:bold;">HK-S100 모니터링 솔루션 v1.0</span>
+        </center>
+        <ul>
+          <li class="nav">
+            <a href="layout.html" title="">
+              <span><img src="../common/img/common/nav_icon_1.png" alt="" style="padding-top:2px;" onerror="this.style.display='none';"></span>
+              HOME
+            </a>
+          </li>
+          <li class="nav">
+            <a href="bell.html" title="">
+              <span><img src="../common/img/common/nav_icon_2.png" alt="" onerror="this.style.display='none';"></span>
+              비상벨작동정보
+            </a>
+          </li>
+          <li class="nav_ov">
+            <a href="data.html" title="">
+              <span><img src="../common/img/common/nav_icon_3_ov.png" alt="" onerror="this.style.display='none';"></span>
+              장비정보관리
+            </a>
+          </li>
+          <li class="nav">
+            <a href="diagnosis.html" title="">
+              <span><img src="../common/img/common/nav_icon_2.png" alt="" onerror="this.style.display='none';"></span>
+              실시간장애진단
+            </a>
+          </li>
+          <li class="nav">
+            <a href="member.html" title="">
+              <span><img src="../common/img/common/nav_icon_4.png" alt="" onerror="this.style.display='none';"></span>
+              멤버등록관리
+            </a>
+          </li>
+          <li class="nav">
+            <a href="sendlog.html" title="">
+              <span><img src="../common/img/common/nav_icon_6.png" alt="" width="23" height="27" onerror="this.style.display='none';"></span>
+              전송로그
+            </a>
+          </li>
+          <li class="nav">
+            <a href="stats.html" title="">
+              <span><img src="../common/img/common/nav_icon_5.png" alt="" width="23" height="27" onerror="this.style.display='none';"></span>
+              통계
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div id="article">
+
+        <div class="guide">
+          <span class="t1">K캅경비구역</span><br>
+          <span class="t2">장비정보관리</span>
+        </div>
+
+        <p class="write_btn">
+          <span class="link_btn_bg">
+            <a href="#" onclick="return false;" target="space">
+              <img src="../common/img/common/write_icon.png" alt=""
+                   onerror="this.style.display='none';">
+              &nbsp; 신규등록
+            </a>
+          </span>
+        </p>
+
+        <div class="seiren_box" style="padding-top:0px;">
+          <span class="no_b" style="float:right;">505</span>
+          <p class="bg">
+            <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
+          </p>
+          <p class="tt">미조치건</p>
+        </div>
+
+        <div class="seiren_box" style="padding-top:0px;">
+          <span class="no_b" style="float:right;">235</span>
+          <p class="bg">
+            <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
+          </p>
+          <p class="tt">경보발생</p>
+        </div>
+
+        <div style="width:99.9%; float:left; background-color:#fff; margin-top:20px;">
+          <table class="list" style="margin-bottom:20px;">
+            <tr>
+              <th width="5%">NO</th>
+              <th width="5%">장비번호</th>
+              <th width="10%">비상벨명</th>
+              <th width="5%">위도</th>
+              <th width="5%">경도</th>
+              <th width="5%">지도</th>
+              <th width="10%">지역</th>
+              <th width="15%">설치주소</th>
+              <th width="10%">전화번호</th>
+              <th width="10%">비상벨구분</th>
+              <th width="10%">수정/삭제</th>
+            </tr>
+            <tr>
+              <td>2384</td>
+              <td><a href="#" onclick="return false;">870745</a></td>
+              <td>대구시 외산공원 지자체방</td>
+              <td>35.8920591</td>
+              <td>128.6399809</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 지저동 822-2</td>
+              <td>012-5818-0045</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2383</td>
+              <td><a href="#" onclick="return false;">870744</a></td>
+              <td>부로이린이공원</td>
+              <td>35.9140674</td>
+              <td>128.6401500</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 부로동 1152-4</td>
+              <td>012-5818-0044</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2382</td>
+              <td><a href="#" onclick="return false;">870743</a></td>
+              <td>남수전정공원</td>
+              <td>35.9175588</td>
+              <td>128.6401354</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 내무동 1567</td>
+              <td>012-5818-0043</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2381</td>
+              <td><a href="#" onclick="return false;">870742</a></td>
+              <td>서당공원</td>
+              <td>35.9264510</td>
+              <td>128.6377215</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 내무동 1525</td>
+              <td>012-5818-0042</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2380</td>
+              <td><a href="#" onclick="return false;">870741</a></td>
+              <td>외산루경공원 - 여자</td>
+              <td>35.9419727</td>
+              <td>128.6300418</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 대학로 70길 40</td>
+              <td>012-5818-0041</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2379</td>
+              <td><a href="#" onclick="return false;">870740</a></td>
+              <td>외산루경공원 - 남자</td>
+              <td>35.9419727</td>
+              <td>128.6300418</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 대학로 70길 40</td>
+              <td>012-5818-0040</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2378</td>
+              <td><a href="#" onclick="return false;">870739</a></td>
+              <td>개발의주차장</td>
+              <td>35.9702041</td>
+              <td>128.7265658</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 지인동 123-12</td>
+              <td>012-5818-0039</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2377</td>
+              <td><a href="#" onclick="return false;">870738</a></td>
+              <td>대구시 외산공원</td>
+              <td>35.8888283</td>
+              <td>128.6371658</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 전서동 27-1</td>
+              <td>012-5818-0038</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2376</td>
+              <td><a href="#" onclick="return false;">870737</a></td>
+              <td>동이의원지 아파트주차장</td>
+              <td>35.8795106</td>
+              <td>128.6500248</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 효목동 1024-1</td>
+              <td>012-5818-0037</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+            <tr>
+              <td>2375</td>
+              <td><a href="#" onclick="return false;">870736</a></td>
+              <td>망우공원(화시센터)</td>
+              <td>35.8760977</td>
+              <td>128.6566080</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">보기</a></span></td>
+              <td>대구광역시 동구</td>
+              <td>대구광역시 동구 효목동 산 234-86</td>
+              <td>012-5818-0036</td>
+              <td>비상벨</td>
+              <td><span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>
+            </tr>
+          </table>
+
+          <div class="c">
+            <p>
+              <div id="search">
+                <form name="searchForm" method="get">
+                  <input type="text" name="sword" value="" placeholder="장비번호" class="input01" style="float:left;margin-left:10px;margin-right:5px;">
+                  <span style="float:left;line-height:18px;" class="search_btn"><a href="#" onclick="return false;">검색</a></span>
+                </form>
+                <a href="#" onclick="return false;"><img src="../common/img/common/paging_first.gif" alt="처음" onerror="this.outerHTML='&laquo;';"></a>
+                <img src="../common/img/common/paging_prev.gif" alt="이전" onerror="this.outerHTML='&lsaquo;';">
+                <span class="num_ov"><a href="#" onclick="return false;">1</a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">2</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">3</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">4</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">5</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">6</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">7</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">8</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">9</strong></a></span>
+                <span class="num"><a href="#" onclick="return false;"><strong style="font-size:12px;margin:0;color:#000000;">10</strong></a></span>
+                <a href="#" onclick="return false;"><img src="../common/img/common/paging_next.gif" alt="다음" onerror="this.outerHTML='&rsaquo;';"></a>
+                <a href="#" onclick="return false;"><img src="../common/img/common/paging_end.gif" alt="마지막" onerror="this.outerHTML='&raquo;';"></a>
+              </div>
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      <img src="../common/img/common/copy.png" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+      <span style="display:none;color:#aab2bd;font-size:12px;">Copyright &copy; K-cop.kr All rights reserved.</span>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      var d = new Date();
+      var el = document.getElementById('topDate');
+      if (el) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        el.textContent = y + '.' + m + '.' + day;
+      }
+    })();
+  </script>
+
+</body>
+</html>

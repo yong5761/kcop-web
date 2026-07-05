@@ -1,0 +1,102 @@
+﻿@charset "UTF-8";
+
+/* Page Title */
+
+ 
+/* �Խ��� */
+
+#board  {width:100%; float:left;}
+
+
+table.list   {width:100%; float:left;  border-bottom:1px solid #707070;  border-top:2px solid #111; border-left:1px solid #ddd;}
+table.list  th   { padding:9px 5px 11px 5px;  vertical-align:middle; background:url('../img/common/th_bg.gif') repeat-x bottom left;   font-size:14px; color:#333;  border-bottom:1px solid #ddd; border-right:1px solid #ddd;}
+table.list  td   {padding:7px 5px 10px 5px;  text-align:center; vertical-align:middle; font-size:13px; line-height:20px; color:#777; border-bottom:1px solid #ddd; border-right:1px solid #ddd;}
+table.list  tr:nth-child(even)   {background-color:rgba(219,219,219,.2);}
+
+
+table.list2   {width:100%; float:left;  border-bottom:1px solid #707070; }
+table.list2  th   { padding:9px 5px 11px 5px;  background-color:#f9f9f9;  font-size:14px; color:#333;  border-bottom:1px solid #ddd;  }
+table.list2  td   {padding:9px 5px 11px 5px;    vertical-align:middle; font-size:13px; line-height:20px; color:#777; border-bottom:1px solid #ddd; }
+
+ 
+.page							{width:100%; text-align:center; margin-bottom:20px; }
+.page  img  {vertical-align:middle;}
+.num                           { font-size:13px; }
+
+
+
+.num  a {
+	display:inline-block;
+	padding:6px 0 7px 0;
+	width:30px; 
+	margin:0 2px 0 2px;
+text-align:center;
+ } 
+
+
+.num a:link	   {text-decoration:none; color:#666;  background-color:#fff;  border:1px solid #ddd;  }
+.num a:visited     {text-decoration:none; color:#666; background-color:#fff;  border:1px solid #ddd;  }
+.num a:hover		{text-decoration:none; color:#999; background-color:#fff;  border:1px solid #ddd;  }
+.num a:active   	{text-decoration:none; color:#999;  background-color:#fff;  border:1px solid #ddd; }
+
+.num_ov                           { font-size:13px; }
+
+.num_ov  a {
+	display:inline-block;
+	padding:6px 0 7px 0;
+	width:30px; 
+	margin:0 2px 0 2px;
+text-align:center;
+ } 
+
+
+.num_ov a:link	   {text-decoration:none; color:#fff;   background-color:#4b637f;  border:1px solid #4b637f; }
+.num_ov a:visited     {text-decoration:none; color:#fff; background-color:#4b637f;  border:1px solid #4b637f; }
+.num_ov a:hover		{text-decoration:none; color:#fff; background-color:#4b637f;  border:1px solid #4b637f;  }
+.num_ov a:active   	{text-decoration:none; color:#fff;  background-color:#4b637f;  border:1px solid #4b637f; }
+
+
+
+table.view .title_bar				 { font-size:14px; font-weight:600;  padding:9px 5px 11px 5px; vertical-align:middle;
+                              background:url('../img/common/th_bg.gif') repeat-x bottom left;   color:#333; border-top:2px solid #111; text-align:center;  }
+
+table.view						{width:100%; float:left;}
+table.view	th			{ vertical-align:middle; border-right:1px solid #ddd; border-left:1px solid #ddd; font-size:14px; background-color:rgba(162,162,162,.1); border-bottom:1px solid #ddd; 
+                         padding:9px 5px 11px 5px;   text-align:center;  font-weight:600; }
+table.view	td			{vertical-align:middle; font-size:14px;  font-size:13px;  border-bottom:1px solid #ddd;  padding:9px 5px 11px 5px;  color:#666;  }
+table.view	td 	.content		{vertical-align:middle; border-bottom:1px solid #ddd; padding:20px 0px 20px 0px; overflow:hidden}
+ 
+
+table.write   {width:100%; float:left;  }
+table.write  th   {padding:7px 7px 9px 11px; vertical-align:middle; background-color:#fff; font-size:14px; text-align:left; font-weight:600; color:#333;  border-bottom:1px solid #ddd;}
+table.write  td   {padding:7px 7px 9px 11px; font-size:13px; color:#777; border-bottom:1px solid #ddd;}
+
+table.write  th span  {border-right:1px solid #ddd; width:80px; float:Left; line-height:14px;}
+table.write  td img  {vertical-align:-10px; margin-left:5px; margin-right:3px;}
+
+ table.write2   {width:100%; float:left;  border:1px solid #ddd;  }
+table.write2  th   {padding:7px 7px 9px 11px; vertical-align:middle; background-color:#f7f7f7; font-size:14px; text-align:left; font-weight:600; color:#333;  border-bottom:1px solid #ddd;}
+table.write2  td   {padding:7px 7px 9px 11px; font-size:13px; color:#777; border-bottom:1px solid #ddd; text-align:left;}
+
+
+							
+#search							{margin-top:30px; float:left;  width:100%; background-color:#f1f1f1; border:1px solid #ddd; 
+                                       text-align:center;  padding:8px 0 10px 0; box-sizing: border-box; -moz-box-sizing: border-box; }
+    
+
+ 
+.search_btn   {  padding:7px 30px 8px 30px;  font-size:13px; line-height:34px; color:#fff; background-color:#333;   border-radius:3px;   }
+
+
+.search_btn  a {
+	display:inline-block;
+     text-decoration:none;
+    
+	
+    
+	}
+
+.search_btn a:link	{  color:#fff;}
+.search_btn a:hover	{color:#fff;}
+.search_btn a:active	{ color:#fff;}
+.search_btn a:visited	{ color:#fff;} 

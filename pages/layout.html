@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>멀티벨 관리시스템</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link href="../common/css/basic.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/board.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/switch.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/default.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/common.css" type="text/css" rel="stylesheet">
+  <style>
+    * { font-family: 'Nanum Gothic', '나눔고딕', NanumGothic, verdana, 'Malgun Gothic', 맑은고딕, sans-serif; }
+    #content #nav li img { vertical-align: middle; margin-right: 4px; }
+    .map-area { float: left; width: 50%; height: 540px; border-top: 2px solid #111; background-color: #c9d3dc; display: flex; align-items: center; justify-content: center; color: #6b7484; font-size: 18px; font-weight: 600; box-sizing: border-box; }
+    .table-area { float: right; width: 50%; box-sizing: border-box; }
+    .article-inner { width: 100%; float: left; }
+  </style>
+  <script src="../common/js/jquery-1.7.1.min.js"></script>
+</head>
+<body>
+
+  <div id="wrap">
+
+    <div id="top">
+      <table>
+        <tbody>
+          <tr>
+            <td style="float:left;" id="topDate"></td>
+            <td style="float:right;">
+              <div class="switch">
+                <input type="checkbox" id="switch2" switch="default">
+                <label for="switch2" data-on-label="ON" data-off-label="OFF"></label>
+              </div>
+            </td>
+            <td style="float:right;">
+              <a href="../login.html" title="">
+                <img src="../common/img/common/logout_btn.png" alt="로그아웃" style="margin-top:2px;"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                <span style="display:none;">로그아웃</span>
+              </a>
+            </td>
+            <td style="float:right;">
+              <img src="../common/img/common/top_icon.png" alt="" style="margin-top:5px;"
+                   onerror="this.style.display='none';">
+              &nbsp;<a href="#" onclick="alert('프로그래머 기능 준비 중');return false;" target="space">프로그래머</a>
+            </td>
+            <td style="float:right;">
+              <a href="#" onclick="alert('공지사항 기능 준비 중');return false;" target="space">공지사항 &nbsp;
+                <span class="no" style="float:right;">0</span>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="content">
+
+      <div id="nav">
+        <ul>
+          <li class="nav_ov">
+            <a href="layout.html" title="">
+              <img src="../common/img/common/nav_icon_1_ov.png" alt="" style="padding-top:2px;" onerror="this.style.display='none';"> HOME
+            </a>
+          </li>
+          <li class="nav">
+            <a href="bell.html" title="">
+              <img src="../common/img/common/nav_icon_2.png" alt="" onerror="this.style.display='none';"> 비상벨작동정보
+            </a>
+          </li>
+          <li class="nav">
+            <a href="data.html" title="">
+              <img src="../common/img/common/nav_icon_3.png" alt="" onerror="this.style.display='none';"> 장비정보관리
+            </a>
+          </li>
+          <li class="nav">
+            <a href="diagnosis.html" title="">
+              <img src="../common/img/common/nav_icon_3.png" alt="" onerror="this.style.display='none';"> 실시간장애진단
+            </a>
+          </li>
+          <li class="nav">
+            <a href="member.html" title="">
+              <img src="../common/img/common/nav_icon_4.png" alt="" onerror="this.style.display='none';"> 멤버등록관리
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="seiren_box" style="padding-top:0px;">
+        <span class="no_b" style="float:right;">491</span>
+        <p class="bg">
+          <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
+        </p>
+        <p class="tt">미조치건</p>
+      </div>
+
+      <div class="seiren_box" style="padding-top:0px;">
+        <span class="no_b" style="float:right;">217</span>
+        <p class="bg">
+          <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
+        </p>
+        <p class="tt">경보발생</p>
+      </div>
+
+      <div id="article">
+        <div class="article-inner">
+          <div class="map-area">지도 영역 (준비 중)</div>
+          <div class="table-area">
+            <ul class="tab">
+              <li style="width:40%;" class="tab_ov" id="map1"><a href="#" onclick="MapType(1);return false">경보발생 최신 작동시간 리스트</a></li>
+              <li style="width:40%;" class="tab_" id="map2"><a href="#" onclick="MapType(2);return false">경보발생 미조치건 리스트</a></li>
+            </ul>
+            <div style="width:99.9%;height:500px;overflow-y:auto;float:left;background-color:#fff;">
+            <table class="list" style="table-layout:fixed;width:100%;">
+              <colgroup>
+                <col style="width:5%">
+                <col style="width:10%">
+                <col style="width:30%">
+                <col style="width:20%">
+                <col style="width:15%">
+                <col style="width:15%">
+              </colgroup>
+              <tr>
+                <th width="5%">NO</th>
+                <th width="10%">지역</th>
+                <th width="30%">설치주소</th>
+                <th width="20%">발생시간</th>
+                <th width="15%">현상태</th>
+                <th width="15%">조치현황</th>
+              </tr>
+              <tr>
+                <td>1<br><span style="color:blue;">332005</span></td>
+                <td></td>
+                <td><a href="#" target="googlemap"></a></td>
+                <td>2026-07-02 16:20:32<br><span style="color:red;"></span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+              <tr>
+                <td>2<br><span style="color:blue;">332005</span></td>
+                <td></td>
+                <td><a href="#" target="googlemap"></a></td>
+                <td>2026-07-02 16:18:22<br><span style="color:red;"></span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+              <tr>
+                <td>3<br><span style="color:blue;">870738</span></td>
+                <td></td>
+                <td><a href="#" target="googlemap"></a></td>
+                <td>2026-07-02 16:16:56<br><span style="color:red;">대구시 외산공원</span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+              <tr>
+                <td>4<br><span style="color:blue;">870735</span></td>
+                <td></td>
+                <td><a href="#" target="googlemap"></a></td>
+                <td>2026-07-02 16:05:49<br><span style="color:red;">외산루공원(통천사)</span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+              <tr>
+                <td>5<br><span style="color:blue;">416671</span></td>
+                <td></td>
+                <td><a href="#" target="googlemap"></a></td>
+                <td>2026-07-02 16:02:46<br><span style="color:red;"></span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+              <tr>
+                <td>6<br><span style="color:blue;">870735</span></td>
+                <td></td>
+                <td><a href="#" target="googlemap"></a></td>
+                <td>2026-07-02 15:57:26<br><span style="color:red;">외산루공원(통천사)</span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+              <tr>
+                <td>7<br><span style="color:blue;">870735</span></td>
+                <td></td>
+                <td><a href="#" target="googlemap"></a></td>
+                <td>2026-07-02 15:54:28<br><span style="color:red;">외산루공원(통천사)</span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+              <tr>
+                <td>8<br><span style="color:blue;">282005</span></td>
+                <td>서울특별시 동대문구 장평고</td>
+                <td><a href="#" target="googlemap">서울특별시 동대문구 장안1동 481-3</a></td>
+                <td>2026-07-02 15:54:04<br><span style="color:red;">장평고</span></td>
+                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
+                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
+              </tr>
+            </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <img src="../common/img/common/copy.png" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+      <span style="display:none;color:#aab2bd;font-size:12px;">Copyright &copy; K-cop.kr All rights reserved.</span>
+    </div>
+
+  </div>
+
+  <script>
+    function MapType(obj) {
+      if (obj == 1) {
+        document.getElementById('map1').className = 'tab_ov';
+        document.getElementById('map2').className = 'tab_';
+      } else {
+        document.getElementById('map1').className = 'tab_';
+        document.getElementById('map2').className = 'tab_ov';
+      }
+    }
+  </script>
+
+  <script>
+    (function () {
+      var d = new Date();
+      var el = document.getElementById('topDate');
+      if (el) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        el.textContent = y + '.' + m + '.' + day;
+      }
+    })();
+  </script>
+
+</body>
+</html>

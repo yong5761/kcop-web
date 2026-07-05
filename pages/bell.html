@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>멀티벨 관리시스템</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link href="../common/css/basic.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/board.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/switch.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/default.css" type="text/css" rel="stylesheet">
+  <link href="../common/css/common.css" type="text/css" rel="stylesheet">
+  <style>
+    .bell-table-wrap { width: 100%; float: left; clear: both; background-color: #fff; margin-top: 20px; height: 600px; overflow-y: auto; box-sizing: border-box; }
+  </style>
+  <script src="../common/js/jquery-1.7.1.min.js"></script>
+</head>
+<body>
+
+  <div id="wrap">
+
+    <div id="top">
+      <table>
+        <tbody>
+          <tr>
+            <td style="float:left;" id="topDate"></td>
+            <td style="float:right;">
+              <div class="switch">
+                <input type="checkbox" id="switch2" switch="default">
+                <label for="switch2" data-on-label="ON" data-off-label="OFF"></label>
+              </div>
+            </td>
+            <td style="float:right;">
+              <a href="../login.html" title="">
+                <img src="../common/img/common/logout_btn.png" alt="로그아웃" style="margin-top:2px;"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
+                <span style="display:none;">로그아웃</span>
+              </a>
+            </td>
+            <td style="float:right;">
+              <img src="../common/img/common/top_icon.png" alt="" style="margin-top:5px;"
+                   onerror="this.style.display='none';">
+              &nbsp;<a href="#" onclick="alert('프로그래머 기능 준비 중');return false;" target="space">프로그래머</a>
+            </td>
+            <td style="float:right;">
+              <a href="#" onclick="alert('공지사항 기능 준비 중');return false;" target="space">공지사항 &nbsp;
+                <span class="no" style="float:right;">0</span>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="content2">
+
+      <div id="nav">
+        <center>
+          <img src="../common/img/common/logo.gif" alt=""
+               style="padding-top:20px;padding-bottom:20px;"
+               onerror="this.style.display='none';">
+          <br><span style="font-size:10px;font-weight:bold;">HK-S100 모니터링 솔루션 v1.0</span>
+        </center>
+        <ul>
+          <li class="nav">
+            <a href="layout.html" title="">
+              <span><img src="../common/img/common/nav_icon_1.png" alt="" style="padding-top:2px;" onerror="this.style.display='none';"></span>
+              HOME
+            </a>
+          </li>
+          <li class="nav_ov">
+            <a href="bell.html" title="">
+              <span><img src="../common/img/common/nav_icon_2_ov.png" alt="" onerror="this.style.display='none';"></span>
+              비상벨작동정보
+            </a>
+          </li>
+          <li class="nav">
+            <a href="data.html" title="">
+              <span><img src="../common/img/common/nav_icon_3.png" alt="" onerror="this.style.display='none';"></span>
+              장비정보관리
+            </a>
+          </li>
+          <li class="nav">
+            <a href="diagnosis.html" title="">
+              <span><img src="../common/img/common/nav_icon_2.png" alt="" onerror="this.style.display='none';"></span>
+              실시간장애진단
+            </a>
+          </li>
+          <li class="nav">
+            <a href="member.html" title="">
+              <span><img src="../common/img/common/nav_icon_4.png" alt="" onerror="this.style.display='none';"></span>
+              멤버등록관리
+            </a>
+          </li>
+          <li class="nav">
+            <a href="sendlog.html" title="">
+              <span><img src="../common/img/common/nav_icon_6.png" alt="" width="23" height="27" onerror="this.style.display='none';"></span>
+              전송로그
+            </a>
+          </li>
+          <li class="nav">
+            <a href="stats.html" title="">
+              <span><img src="../common/img/common/nav_icon_5.png" alt="" width="23" height="27" onerror="this.style.display='none';"></span>
+              통계
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div id="article">
+
+        <div class="guide">
+          <span class="t1">K캅경비구역</span><br>
+          <span class="t2">비상벨작동정보</span>
+        </div>
+
+        <div class="seiren_box" style="padding-top:0px;">
+          <span class="no_b" style="float:right;">137</span>
+          <p class="bg">
+            <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
+          </p>
+          <p class="tt">미조치건</p>
+        </div>
+
+        <div class="seiren_box" style="padding-top:0px;">
+          <span class="no_b" style="float:right;">49</span>
+          <p class="bg">
+            <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
+          </p>
+          <p class="tt">경보발생</p>
+        </div>
+
+        <div class="bell-table-wrap">
+          <table class="list" style="table-layout:fixed;width:100%;">
+            <colgroup>
+              <col style="width:6%">
+              <col style="width:14%">
+              <col style="width:24%">
+              <col style="width:18%">
+              <col style="width:12%">
+              <col style="width:9%">
+              <col style="width:9%">
+              <col style="width:8%">
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowspan="2">NO</th>
+                <th rowspan="2">지역/이름</th>
+                <th rowspan="2">설치주소</th>
+                <th rowspan="2">발생시간</th>
+                <th rowspan="2">현상태</th>
+                <th colspan="3">조치현황</th>
+              </tr>
+              <tr>
+                <th>조치자</th>
+                <th>조치시간</th>
+                <th>조치내용</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1<br><span style="color:blue;">870735</span></td>
+                <td>대구광역시 동구<br>이양루공원(통천사)</td>
+                <td><a href="#" target="googlemap">대구광역시 동구 효목동 3-11</a></td>
+                <td>2026-07-02 18:47:14<br><span style="color:red;"></span></td>
+                <td><a href="#" target="_top"><span class="red">경보발생 (01)</span></a></td>
+                <td>0</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>2<br><span style="color:blue;">870738</span></td>
+                <td>대구광역시 동구<br>외산루공원</td>
+                <td><a href="#" target="googlemap">대구광역시 동구 도평동 2-1</a></td>
+                <td>2026-07-02 16:20:32<br><span style="color:red;">외산루공원</span></td>
+                <td><a href="#" target="_top"><span class="red">경보발생 (01)</span></a></td>
+                <td>0</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>3<br><span style="color:blue;">416671</span></td>
+                <td>서울특별시 마포구<br>손기정체육공원</td>
+                <td><a href="#" target="googlemap">서울 마포구 만리동2가 6-1</a></td>
+                <td>2026-07-02 14:40:59<br><span style="color:red;"></span></td>
+                <td><a href="#" target="_top"><span class="red">경보발생 (01)</span></a></td>
+                <td>0</td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>4<br><span style="color:blue;">282005</span></td>
+                <td>서울특별시 동대문구<br>장평고</td>
+                <td><a href="#" target="googlemap">서울 동대문구 장안1동 481-3</a></td>
+                <td>2026-07-02 13:25:11<br><span style="color:red;">장평고</span></td>
+                <td><a href="#" target="_top"><span class="red">경보발생 (02)</span></a></td>
+                <td>홍길동</td>
+                <td>2026-07-02 13:45:00</td>
+                <td>현장 출동 확인</td>
+              </tr>
+              <tr>
+                <td>5<br><span style="color:blue;">332005</span></td>
+                <td>서울특별시 은평구<br>불광근린공원</td>
+                <td><a href="#" target="googlemap">서울 은평구 불광동 산1-1</a></td>
+                <td>2026-07-02 08:20:44<br><span style="color:red;"></span></td>
+                <td><a href="#" target="_top"><span style="color:blue;">정상(복구)</span></a></td>
+                <td>이영희</td>
+                <td>2026-07-02 08:40:00</td>
+                <td>오작동 처리</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      <img src="../common/img/common/copy.png" alt=""
+           onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+      <span style="display:none;color:#aab2bd;font-size:12px;">Copyright &copy; K-cop.kr All rights reserved.</span>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      var d = new Date();
+      var el = document.getElementById('topDate');
+      if (el) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        el.textContent = y + '.' + m + '.' + day;
+      }
+    })();
+  </script>
+
+</body>
+</html>
