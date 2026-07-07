@@ -114,18 +114,18 @@
             <div style="width:99.9%;height:500px;overflow-y:auto;float:left;background-color:#fff;">
             <table class="list" style="table-layout:fixed;width:100%;">
               <colgroup>
-                <col style="width:5%">
+                <col style="width:9%">
                 <col style="width:10%">
-                <col style="width:30%">
+                <col style="width:26%">
                 <col style="width:20%">
                 <col style="width:15%">
                 <col style="width:15%">
               </colgroup>
               <thead>
                 <tr>
-                  <th width="5%">NO</th>
+                  <th width="9%">NO</th>
                   <th width="10%">지역</th>
-                  <th width="30%">설치주소</th>
+                  <th width="26%">설치주소</th>
                   <th width="20%">발생시간</th>
                   <th width="15%">현상태</th>
                   <th width="15%">조치현황</th>
@@ -183,8 +183,9 @@
       for (var i = 0; i < rows.length; i++) {
         var r = rows[i];
         var no = i + 1;
-        var noSub = r.machine_no != null ? r.machine_no : r.phone_no;
-        var noCell = no + '<br><span style="color:#0000cc;">' + noSub + '</span>';
+        var noCell = r.machine_no != null
+          ? (no + '<br><span style="color:#0000cc;">' + r.machine_no + '</span>')
+          : String(no);
         var timeCell = formatKST(r.occurred_at);
         if (r.bell_name) {
           timeCell += '<br><span style="color:red;">' + r.bell_name + '</span>';
@@ -197,14 +198,16 @@
         } else {
           statusCell = r.status || '-';
         }
-        var td = ' style="padding:8px 4px;overflow-wrap:break-word;word-break:break-all;"';
+        var tdNo   = ' style="padding:8px 4px;white-space:nowrap;text-align:center;"';
+        var tdAddr = ' style="padding:8px 4px;word-break:break-all;"';
+        var tdRest = ' style="padding:8px 4px;overflow-wrap:break-word;"';
         html += '<tr>'
-          + '<td' + td + '>' + noCell + '</td>'
-          + '<td' + td + '>' + (r.region || '') + '</td>'
-          + '<td' + td + '>' + (r.address || '') + '</td>'
-          + '<td' + td + '>' + timeCell + '</td>'
-          + '<td' + td + '>' + statusCell + '</td>'
-          + '<td' + td + '><span class="link_btn_bg_s"><a href="#" onclick="return false;">조치현황</a></span></td>'
+          + '<td' + tdNo   + '>' + noCell + '</td>'
+          + '<td' + tdRest + '>' + (r.region || '') + '</td>'
+          + '<td' + tdAddr + '>' + (r.address || '') + '</td>'
+          + '<td' + tdRest + '>' + timeCell + '</td>'
+          + '<td' + tdRest + '>' + statusCell + '</td>'
+          + '<td' + tdRest + '><span class="link_btn_bg_s"><a href="#" onclick="return false;">조치현황</a></span></td>'
           + '</tr>';
       }
       if (html === '') {
