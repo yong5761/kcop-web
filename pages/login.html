@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>멀티벨 관리시스템</title>
+  <link rel="stylesheet" href="common/css/login.css">
+</head>
+<body>
+  <div id="login_wrap">
+
+    <p class="logo">
+      <img src="common/img/login/login_logo.png" alt="" class="logo-img"
+           onerror="this.style.display='none'; this.parentElement.classList.add('no-img');">
+      <span class="logo-ph">멀티벨 관리시스템</span>
+    </p>
+
+    <div class="box">
+      <div class="in">
+        <p class="t1">
+          <img src="common/img/login/title_1.png" alt="LOGIN" class="t1-img"
+               onerror="this.style.display='none'; this.parentElement.classList.add('no-img');">
+          <span class="t1-ph">LOGIN</span>
+        </p>
+        <p class="t2">
+          <img src="common/img/login/title_2.png" alt="아이디 및 비밀번호는 대소문자를 구분하오니 주의하시길 바랍니다." class="t2-img"
+               onerror="this.style.display='none'; this.parentElement.classList.add('no-img');">
+          <span class="t2-ph">아이디 및 비밀번호는 <span class="hl">대소문자</span>를 구분하오니 주의하시길 바랍니다.</span>
+        </p>
+        <form id="adminform" onsubmit="return doLogin(event);">
+          <table>
+            <tbody>
+              <tr>
+                <td>아이디</td>
+                <td><input type="text" id="mem_id" name="mem_id" maxlength="20" class="input01"></td>
+                <td rowspan="2">
+                  <button type="submit" id="btn_submit" class="btn-login">
+                    <img src="common/img/login/btn.png" alt="" class="btn-img"
+                         onerror="this.style.display='none'; this.parentElement.classList.add('no-img');">
+                    <span class="btn-text">로그인</span>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>비밀번호</td>
+                <td><input type="password" id="mem_pwd" name="mem_pwd" maxlength="20" class="input01"></td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+
+    <p class="footer">
+      <img src="common/img/login/copy.png" alt="" class="footer-img"
+           onerror="this.style.display='none'; this.parentElement.classList.add('no-img');">
+      <span class="footer-ph">Copyright &copy; 멀티벨 관리시스템 All rights reserved.</span>
+    </p>
+
+  </div>
+
+  <script>
+    function doLogin(e) {
+      e.preventDefault();
+      var id = document.getElementById('mem_id').value.trim();
+      var pw = document.getElementById('mem_pwd').value.trim();
+      if (!id) {
+        alert('아이디를 입력하세요.');
+        document.getElementById('mem_id').focus();
+        return false;
+      }
+      if (!pw) {
+        alert('비밀번호를 입력하세요.');
+        document.getElementById('mem_pwd').focus();
+        return false;
+      }
+      location.href = 'pages/layout.html';
+      return false;
+    }
+  </script>
+</body>
+</html>
