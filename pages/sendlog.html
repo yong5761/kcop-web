@@ -84,6 +84,15 @@
           </thead>
           <tbody id="sendlog-tbody"></tbody>
         </table>
+        <div class="c">
+          <div id="search">
+            <form name="searchForm" onsubmit="return false;">
+              <input type="text" name="sword" id="sendlog-sword" value="" placeholder="장비번호" class="input01" style="float:left;margin-left:10px;margin-right:5px;" />
+              <span style="float:left;line-height:18px;" class="search_btn"><a href="#" onclick="doSearch();return false;">검색</a></span>
+            </form>
+            <span id="sendlog-paging"></span>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -105,26 +114,94 @@
     }
   })();
 
+  var allRows = [];
+  var filteredRows = [];
+  var currentPage = 1;
+  var PAGE_SIZE = 10;
+
   function formatPhone(phone_no) {
     var s = '0' + String(phone_no);
     while (s.length < 11) s = '0' + s;
     return s.slice(0, 3) + '-' + s.slice(3, 7) + '-' + s.slice(7, 11);
   }
 
-  function renderRows(rows) {
+  function formatLastSeen(isoStr) {
+    if (!isoStr) return null;
+    var d = new Date(isoStr);
+    var kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    var y = kst.getUTCFullYear();
+    var mo = String(kst.getUTCMonth() + 1).padStart(2, '0');
+    var day = String(kst.getUTCDate()).padStart(2, '0');
+    var h = String(kst.getUTCHours()).padStart(2, '0');
+    var mi = String(kst.getUTCMinutes()).padStart(2, '0');
+    var sec = String(kst.getUTCSeconds()).padStart(2, '0');
+    return y + '-' + mo + '-' + day + ' ' + h + ':' + mi + ':' + sec;
+  }
+
+  function applyFilter(sword) {
+    if (!sword) {
+      filteredRows = allRows.slice();
+      return;
+    }
+    var lc = sword.toLowerCase();
+    filteredRows = allRows.filter(function(r) {
+      var machineStr  = r.machine_no != null ? String(r.machine_no).toLowerCase() : '';
+      var bellNameStr = r.bell_name  != null ? r.bell_name.toLowerCase()          : '';
+      var regionStr   = r.region     != null ? r.region.toLowerCase()             : '';
+      var addressStr  = r.address    != null ? r.address.toLowerCase()            : '';
+      var phoneRaw    = String(r.phone_no);
+      var phoneFmt    = formatPhone(r.phone_no);
+      return machineStr.indexOf(lc)  !== -1
+          || bellNameStr.indexOf(lc) !== -1
+          || regionStr.indexOf(lc)   !== -1
+          || addressStr.indexOf(lc)  !== -1
+          || phoneRaw.indexOf(lc)    !== -1
+          || phoneFmt.indexOf(lc)    !== -1;
+    });
+  }
+
+  function doSearch() {
+    var sword = document.getElementById('sendlog-sword').value.trim();
+    applyFilter(sword);
+    currentPage = 1;
+    renderPage();
+  }
+
+  function goToPage(n) {
+    var totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+    if (n < 1) n = 1;
+    if (n > totalPages) n = totalPages;
+    currentPage = n;
+    renderPage();
+  }
+
+  function renderPage() {
     var tbody = document.getElementById('sendlog-tbody');
     if (!tbody) return;
+
+    var totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var pageRows = filteredRows.slice(start, start + PAGE_SIZE);
+
     var html = '';
-    for (var i = 0; i < rows.length; i++) {
-      var r = rows[i];
+    for (var i = 0; i < pageRows.length; i++) {
+      var r = pageRows[i];
+      var no = start + i + 1;
       var mapCell = (r.lat != null && r.lng != null)
         ? '<span class="link_btn_bg_s"><a href="#" onclick="return false;">보기</a></span>'
         : '-';
-      var stateCell = r.comm_state === '통신장애'
-        ? '<strong><span style="color:red;">통신장애</span></strong>'
-        : r.comm_state || '-';
+      var stateCell;
+      if (r.comm_state === '통신장애') {
+        stateCell = '<strong><span style="color:red;">통신장애</span></strong>';
+      } else {
+        stateCell = r.comm_state || '-';
+      }
+      var lastSeenStr = formatLastSeen(r.last_seen);
+      if (lastSeenStr) {
+        stateCell += '<br><small>' + lastSeenStr + '</small>';
+      }
       html += '<tr>'
-        + '<td>' + (i + 1) + '</td>'
+        + '<td>' + no + '</td>'
         + '<td>' + (r.machine_no != null ? r.machine_no : '-') + '</td>'
         + '<td>' + (r.bell_name != null ? r.bell_name : '-') + '</td>'
         + '<td>' + mapCell + '</td>'
@@ -138,6 +215,29 @@
       html = '<tr><td colspan="8">데이터를 불러오지 못했습니다</td></tr>';
     }
     tbody.innerHTML = html;
+
+    renderPaging(totalPages);
+  }
+
+  function renderPaging(totalPages) {
+    var el = document.getElementById('sendlog-paging');
+    if (!el) return;
+    var BLOCK = 10;
+    var blockStart = Math.floor((currentPage - 1) / BLOCK) * BLOCK + 1;
+    var blockEnd = Math.min(blockStart + BLOCK - 1, totalPages);
+    var html = '';
+    html += '<a href="#" onclick="goToPage(1);return false;"><img src="../common/img/common/paging_first.gif" alt="처음" /></a>';
+    html += '<a href="#" onclick="goToPage(' + (currentPage - 1) + ');return false;"><img src="../common/img/common/paging_prev.gif" alt="이전" /></a>';
+    for (var p = blockStart; p <= blockEnd; p++) {
+      if (p === currentPage) {
+        html += '<span class="num_ov"><a href="#" onclick="goToPage(' + p + ');return false;" style="text-decoration:none;">' + p + '</a></span> ';
+      } else {
+        html += '<span class="num"><a href="#" onclick="goToPage(' + p + ');return false;" style="text-decoration:none;"><strong style="font-size:12px;margin:0px 0px 0 0;color:#000000;">' + p + '</strong></a></span> ';
+      }
+    }
+    html += '<a href="#" onclick="goToPage(' + (currentPage + 1) + ');return false;"><img src="../common/img/common/paging_next.gif" alt="다음" /></a>';
+    html += '<a href="#" onclick="goToPage(' + totalPages + ');return false;"><img src="../common/img/common/paging_end.gif" alt="마지막" /></a>';
+    el.innerHTML = html;
   }
 
   function renderSummary(s) {
@@ -147,11 +247,18 @@
   }
 
   function loadData() {
+    var savedPage = currentPage;
+    var savedSword = document.getElementById('sendlog-sword') ? document.getElementById('sendlog-sword').value.trim() : '';
+
     fetch('/api/bells')
       .then(function(res) { return res.json(); })
       .then(function(j) {
         if (!j.ok) throw new Error('ok:false');
-        renderRows(j.rows);
+        allRows = j.rows;
+        applyFilter(savedSword);
+        var totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+        currentPage = Math.min(savedPage, totalPages);
+        renderPage();
       })
       .catch(function() {
         var tbody = document.getElementById('sendlog-tbody');
