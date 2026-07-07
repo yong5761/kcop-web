@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(New-Item -ItemType Directory -Force \"c:/Users/USER/Desktop/KcopWeb/common/css\")",
+      "Bash(New-Item -ItemType Directory -Force \"c:/Users/USER/Desktop/KcopWeb/common/img/login\")",
+      "Bash(cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\logo.gif\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\" && cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\logout_btn.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\")",
+      "Bash(cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\music_icon.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\" && cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\nav_icon_1.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\")",
+      "Bash(cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\nav_icon_2.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\" && cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\nav_icon_2_ov.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\")",
+      "Bash(cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\nav_icon_3.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\" && cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\nav_icon_4.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\")",
+      "Bash(cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\nav_icon_5.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\" && cp \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell\\\\nav_icon_6.png\" \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\common\\\\img\\\\common\\\\\")",
+      "PowerShell(Test-Path \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell.html\"; \\(Get-Item \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell.html\"\\).Length)",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\bell.html\" -Encoding UTF8\\) | Select-String \"music_icon\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\pages\")",
+      "PowerShell(\\($lines | Select-String 'src=\".\\\\.\\\\.\\\\/common\\\\/js'\\).Line)",
+      "PowerShell(\\($lines | Select-String 'jquery'\\).Line)",
+      "PowerShell(\\($lines | Select-String 'script'\\).Line)",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\실시간장애진단\" -Recurse | Select-Object @{N='경로';E={$_.FullName.Replace\\(\"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\실시간장애진단\\\\\",\"\"\\)}}, @{N='크기';E={$_.Length}} | Format-Table -AutoSize)",
+      "PowerShell(Remove-Item -Recurse -Force \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\\\\�����ϰ���\" -Confirm:$false)",
+      "Read(//c/Users/USER/.claude/projects/c--Users-USER-Desktop-KcopWeb/memory/**)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh api *)",
+      "Bash(echo \"\")",
+      "Bash(git commit *)",
+      "Bash(cd \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\" && rm -rf \"멤버등록 관리\" \"실시간장애진단\" \"장비정보관리\" \"전송로그\" \"통계\" img_diff.html && ls --color=never)",
+      "PowerShell(node src/mqtt/parseBellData.js)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\USER\\Desktop\\KcopWeb\\common",
+      "c:\\Users\\USER\\Desktop\\KcopWeb\\img",
+      "c:\\Users\\USER\\Desktop\\KcopWeb\\멤버등록 관리"
+    ]
+  }
+}
