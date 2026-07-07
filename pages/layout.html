@@ -197,13 +197,14 @@
         } else {
           statusCell = r.status || '-';
         }
+        var td = ' style="padding:8px 4px;overflow-wrap:break-word;word-break:break-all;"';
         html += '<tr>'
-          + '<td style="padding:8px 4px;">' + noCell + '</td>'
-          + '<td style="padding:8px 4px;">' + (r.region || '') + '</td>'
-          + '<td style="padding:8px 4px;overflow-wrap:break-word;word-break:break-all;">' + (r.address || '') + '</td>'
-          + '<td style="padding:8px 4px;">' + timeCell + '</td>'
-          + '<td style="padding:8px 4px;">' + statusCell + '</td>'
-          + '<td style="padding:8px 4px;"><span class="link_btn_bg_s"><a href="#" onclick="return false;">조치현황</a></span></td>'
+          + '<td' + td + '>' + noCell + '</td>'
+          + '<td' + td + '>' + (r.region || '') + '</td>'
+          + '<td' + td + '>' + (r.address || '') + '</td>'
+          + '<td' + td + '>' + timeCell + '</td>'
+          + '<td' + td + '>' + statusCell + '</td>'
+          + '<td' + td + '><span class="link_btn_bg_s"><a href="#" onclick="return false;">조치현황</a></span></td>'
           + '</tr>';
       }
       if (html === '') {
