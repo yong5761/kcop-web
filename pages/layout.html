@@ -223,7 +223,7 @@
         document.getElementById('map1').className = 'tab_';
         document.getElementById('map2').className = 'tab_ov';
         var unresolved = allRows.filter(function (r) {
-          return r.status === '경보발생' && !r.resolved_at;
+          return r.status === '경보발생';
         });
         renderRows(unresolved);
       }
