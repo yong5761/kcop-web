@@ -179,6 +179,7 @@
 
   </div>
 
+  <script src="../common/js/map-popup.js"></script>
   <script>
     (function () {
       var d = new Date();
@@ -190,6 +191,11 @@
         el.textContent = y + '.' + m + '.' + day;
       }
     })();
+
+    function escJs(s) {
+      if (s == null) return '';
+      return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r/g, '').replace(/\n/g, ' ');
+    }
 
     var allRows = [];
     var filteredRows = [];
@@ -252,7 +258,7 @@
         var r = pageRows[i];
         var no = start + i + 1;
         var mapCell = (r.lat != null && r.lng != null)
-          ? '<span class="link_btn_bg_s"><a href="#" onclick="return false;">보기</a></span>'
+          ? '<span class="link_btn_bg_s"><a href="#" onclick="showBellMap(' + r.lat + ',' + r.lng + ',\'' + escJs(r.bell_name) + '\',\'' + escJs(r.address) + '\');return false;">보기</a></span>'
           : '-';
         html += '<tr>'
           + '<td>' + no + '</td>'
