@@ -243,8 +243,9 @@
       for (var i = 0; i < pageRows.length; i++) {
         var r = pageRows[i];
         var no = start + i + 1;
-        var noSub = r.machine_no != null ? r.machine_no : r.phone_no;
-        var noCell = no + '<br><span style="color:#2244aa;">' + noSub + '</span>';
+        var noCell = r.machine_no != null
+          ? (no + '<br><span style="color:#0000cc;">' + r.machine_no + '</span>')
+          : String(no);
         var nameCell;
         if (r.region != null || r.bell_name != null) {
           var regionPart = r.region != null ? r.region : '';
