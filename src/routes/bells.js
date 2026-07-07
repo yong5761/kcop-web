@@ -1,0 +1,69 @@
+'use strict';
+
+const { Router } = require('express');
+const pool = require('../db');
+
+const router = Router();
+
+router.get('/api/bells', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT
+         b.phone_no, b.bell_name, b.region, b.address, b.lat, b.lng, b.machine_no,
+         bl.last_seq, bl.voltage, bl.bellstatus, bl.fw_version, bl.last_seen,
+         CASE
+           WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 5 MINUTE)
+           THEN '통신장애'
+           ELSE '정상'
+         END AS comm_state
+       FROM bells b
+       LEFT JOIN bell_latest bl ON b.phone_no = bl.phone_no
+       ORDER BY b.phone_no ASC`
+    );
+    res.json({ ok: true, rows });
+  } catch (e) {
+    console.error('[API] GET /api/bells error:', e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+router.get('/api/bells/:phone/logs', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT id, op, seq, voltage, bellstatus, machinenum, bellnumber, fw_version, raw_msg, received_at
+       FROM bell_logs
+       WHERE phone_no = ?
+       ORDER BY received_at DESC
+       LIMIT 100`,
+      [req.params.phone]
+    );
+    res.json({ ok: true, rows });
+  } catch (e) {
+    console.error('[API] GET /api/bells/:phone/logs error:', e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+router.get('/api/stats/summary', async (req, res) => {
+  try {
+    const [[{ total }]] = await pool.execute(
+      `SELECT COUNT(*) AS total FROM bells`
+    );
+    const [[{ normal, fault }]] = await pool.execute(
+      `SELECT
+         SUM(CASE WHEN bl.last_seen IS NOT NULL AND bl.last_seen >= (NOW() - INTERVAL 5 MINUTE) THEN 1 ELSE 0 END) AS normal,
+         SUM(CASE WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 5 MINUTE) THEN 1 ELSE 0 END) AS fault
+       FROM bells b
+       LEFT JOIN bell_latest bl ON b.phone_no = bl.phone_no`
+    );
+    const [[{ logs_24h }]] = await pool.execute(
+      `SELECT COUNT(*) AS logs_24h FROM bell_logs WHERE received_at > NOW() - INTERVAL 1 DAY`
+    );
+    res.json({ ok: true, total, normal, fault, logs_24h });
+  } catch (e) {
+    console.error('[API] GET /api/stats/summary error:', e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+module.exports = router;

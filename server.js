@@ -10,6 +10,8 @@ const app = express();
 
 app.use(express.static(path.join(__dirname)));
 
+app.use('/', require('./src/routes/bells'));
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });

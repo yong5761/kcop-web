@@ -43,6 +43,15 @@ function startIngest() {
 
     try {
       await pool.execute(
+        `INSERT INTO bells (phone_no) VALUES (?) ON DUPLICATE KEY UPDATE phone_no = phone_no`,
+        [r.phonenumber]
+      );
+    } catch (e) {
+      console.error('[DB] bells upsert error:', e.message);
+    }
+
+    try {
+      await pool.execute(
         `INSERT INTO bell_logs (phone_no, op, seq, voltage, bellstatus, machinenum, bellnumber, fw_version, raw_msg, received_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [r.phonenumber, payload.op ?? null, r.seqnum, r.voltage, r.bellstatus, r.machinenum, r.bellnumber, r.fw_version, String(payload.msg).toUpperCase(), now]
