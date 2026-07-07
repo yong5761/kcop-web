@@ -88,7 +88,7 @@
       </div>
 
       <div class="seiren_box" style="padding-top:0px;">
-        <span class="no_b" style="float:right;">0</span>
+        <span class="no_b" id="layout-badge-unadjusted" style="float:right;">0</span>
         <p class="bg">
           <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
         </p>
@@ -96,7 +96,7 @@
       </div>
 
       <div class="seiren_box" style="padding-top:0px;">
-        <span class="no_b" style="float:right;">0</span>
+        <span class="no_b" id="layout-badge-alarm" style="float:right;">0</span>
         <p class="bg">
           <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
         </p>
@@ -121,78 +121,17 @@
                 <col style="width:15%">
                 <col style="width:15%">
               </colgroup>
-              <tr>
-                <th width="5%">NO</th>
-                <th width="10%">지역</th>
-                <th width="30%">설치주소</th>
-                <th width="20%">발생시간</th>
-                <th width="15%">현상태</th>
-                <th width="15%">조치현황</th>
-              </tr>
-              <tr>
-                <td>1<br><span style="color:blue;">332005</span></td>
-                <td></td>
-                <td><a href="#" target="googlemap"></a></td>
-                <td>2026-07-02 16:20:32<br><span style="color:red;"></span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
-              <tr>
-                <td>2<br><span style="color:blue;">332005</span></td>
-                <td></td>
-                <td><a href="#" target="googlemap"></a></td>
-                <td>2026-07-02 16:18:22<br><span style="color:red;"></span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
-              <tr>
-                <td>3<br><span style="color:blue;">870738</span></td>
-                <td></td>
-                <td><a href="#" target="googlemap"></a></td>
-                <td>2026-07-02 16:16:56<br><span style="color:red;">대구시 외산공원</span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
-              <tr>
-                <td>4<br><span style="color:blue;">870735</span></td>
-                <td></td>
-                <td><a href="#" target="googlemap"></a></td>
-                <td>2026-07-02 16:05:49<br><span style="color:red;">외산루공원(통천사)</span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
-              <tr>
-                <td>5<br><span style="color:blue;">416671</span></td>
-                <td></td>
-                <td><a href="#" target="googlemap"></a></td>
-                <td>2026-07-02 16:02:46<br><span style="color:red;"></span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
-              <tr>
-                <td>6<br><span style="color:blue;">870735</span></td>
-                <td></td>
-                <td><a href="#" target="googlemap"></a></td>
-                <td>2026-07-02 15:57:26<br><span style="color:red;">외산루공원(통천사)</span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
-              <tr>
-                <td>7<br><span style="color:blue;">870735</span></td>
-                <td></td>
-                <td><a href="#" target="googlemap"></a></td>
-                <td>2026-07-02 15:54:28<br><span style="color:red;">외산루공원(통천사)</span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
-              <tr>
-                <td>8<br><span style="color:blue;">282005</span></td>
-                <td>서울특별시 동대문구 장평고</td>
-                <td><a href="#" target="googlemap">서울특별시 동대문구 장안1동 481-3</a></td>
-                <td>2026-07-02 15:54:04<br><span style="color:red;">장평고</span></td>
-                <td><a href="bell.html" target="_top"><span class="red"> 경보발생 (01)</span></a></td>
-                <td><span class="link_btn_bg_s"><a href="#" title="">조치현황</a></span></td>
-              </tr>
+              <thead>
+                <tr>
+                  <th width="5%">NO</th>
+                  <th width="10%">지역</th>
+                  <th width="30%">설치주소</th>
+                  <th width="20%">발생시간</th>
+                  <th width="15%">현상태</th>
+                  <th width="15%">조치현황</th>
+                </tr>
+              </thead>
+              <tbody id="layout-tbody"></tbody>
             </table>
             </div>
           </div>
@@ -210,18 +149,6 @@
   </div>
 
   <script>
-    function MapType(obj) {
-      if (obj == 1) {
-        document.getElementById('map1').className = 'tab_ov';
-        document.getElementById('map2').className = 'tab_';
-      } else {
-        document.getElementById('map1').className = 'tab_';
-        document.getElementById('map2').className = 'tab_ov';
-      }
-    }
-  </script>
-
-  <script>
     (function () {
       var d = new Date();
       var el = document.getElementById('topDate');
@@ -232,6 +159,103 @@
         el.textContent = y + '.' + m + '.' + day;
       }
     })();
+
+    var allRows = [];
+    var currentTab = 1;
+
+    function formatKST(isoStr) {
+      if (!isoStr) return '-';
+      var d = new Date(isoStr);
+      var kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+      var y = kst.getUTCFullYear();
+      var mo = String(kst.getUTCMonth() + 1).padStart(2, '0');
+      var day = String(kst.getUTCDate()).padStart(2, '0');
+      var h = String(kst.getUTCHours()).padStart(2, '0');
+      var mi = String(kst.getUTCMinutes()).padStart(2, '0');
+      var sec = String(kst.getUTCSeconds()).padStart(2, '0');
+      return y + '-' + mo + '-' + day + ' ' + h + ':' + mi + ':' + sec;
+    }
+
+    function renderRows(rows) {
+      var tbody = document.getElementById('layout-tbody');
+      if (!tbody) return;
+      var html = '';
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var no = i + 1;
+        var noSub = r.machine_no != null ? r.machine_no : r.phone_no;
+        var noCell = no + '<br><span style="color:#0000cc;">' + noSub + '</span>';
+        var timeCell = formatKST(r.occurred_at);
+        if (r.bell_name) {
+          timeCell += '<br><span style="color:red;">' + r.bell_name + '</span>';
+        }
+        var statusCell;
+        if (r.status === '경보발생') {
+          statusCell = '<strong><span style="color:#cc0000;">경보발생 (01)</span></strong>';
+        } else if (r.status === '정상복구') {
+          statusCell = '<span style="color:#2244aa;">정상복구 (03)</span>';
+        } else {
+          statusCell = r.status || '-';
+        }
+        html += '<tr>'
+          + '<td style="padding:8px 4px;">' + noCell + '</td>'
+          + '<td style="padding:8px 4px;">' + (r.region || '') + '</td>'
+          + '<td style="padding:8px 4px;overflow-wrap:break-word;word-break:break-all;">' + (r.address || '') + '</td>'
+          + '<td style="padding:8px 4px;">' + timeCell + '</td>'
+          + '<td style="padding:8px 4px;">' + statusCell + '</td>'
+          + '<td style="padding:8px 4px;"><span class="link_btn_bg_s"><a href="#" onclick="return false;">조치현황</a></span></td>'
+          + '</tr>';
+      }
+      if (html === '') {
+        html = '<tr><td colspan="6">데이터가 없습니다</td></tr>';
+      }
+      tbody.innerHTML = html;
+    }
+
+    function MapType(tab) {
+      currentTab = tab;
+      if (tab === 1) {
+        document.getElementById('map1').className = 'tab_ov';
+        document.getElementById('map2').className = 'tab_';
+        renderRows(allRows);
+      } else {
+        document.getElementById('map1').className = 'tab_';
+        document.getElementById('map2').className = 'tab_ov';
+        var unresolved = allRows.filter(function (r) {
+          return r.status === '경보발생' && !r.resolved_at;
+        });
+        renderRows(unresolved);
+      }
+    }
+
+    function renderBadges(s) {
+      var unadj = document.getElementById('layout-badge-unadjusted');
+      var alarm = document.getElementById('layout-badge-alarm');
+      if (unadj) unadj.textContent = s.alarm_active;
+      if (alarm) alarm.textContent = s.alarm_active;
+    }
+
+    function loadData() {
+      fetch('/api/events')
+        .then(function (res) { return res.json(); })
+        .then(function (j) {
+          if (!j.ok) throw new Error('ok:false');
+          allRows = j.rows;
+          MapType(currentTab);
+        })
+        .catch(function () {
+          var tbody = document.getElementById('layout-tbody');
+          if (tbody) tbody.innerHTML = '<tr><td colspan="6">데이터를 불러오지 못했습니다</td></tr>';
+        });
+
+      fetch('/api/stats/summary')
+        .then(function (res) { return res.json(); })
+        .then(function (j) { if (j.ok) renderBadges(j); })
+        .catch(function () {});
+    }
+
+    loadData();
+    setInterval(loadData, 30000);
   </script>
 
 </body>

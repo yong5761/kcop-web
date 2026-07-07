@@ -24,7 +24,16 @@
       "Bash(echo \"\")",
       "Bash(git commit *)",
       "Bash(cd \"c:\\\\Users\\\\USER\\\\Desktop\\\\KcopWeb\" && rm -rf \"멤버등록 관리\" \"실시간장애진단\" \"장비정보관리\" \"전송로그\" \"통계\" img_diff.html && ls --color=never)",
-      "PowerShell(node src/mqtt/parseBellData.js)"
+      "PowerShell(node src/mqtt/parseBellData.js)",
+      "Bash(ssh -o StrictHostKeyChecking=no -p 2540 root@211.115.76.21 'mysql -u root -p'\\\\''231218hks^@'\\\\'' kcop -e \" *)",
+      "Bash(sshpass -p 231218hks^@ ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=yes -o PubkeyAuthentication=no -p 2540 root@211.115.76.21 'mysql -u root -p'\\\\''231218hks^@'\\\\'' kcop -e \" *)",
+      "Bash(command -v plink)",
+      "Bash(command -v expect)",
+      "PowerShell(Get-Command plink, putty, ssh -ErrorAction SilentlyContinue)",
+      "PowerShell(python -c \"import paramiko; print\\('paramiko ok'\\)\" 2>&1)",
+      "PowerShell(pip install paramiko -q 2>&1)",
+      "PowerShell(python \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-USER-Desktop-KcopWeb\\\\328ca797-80a0-4edc-93ed-ee1129bf78a5\\\\scratchpad\\\\query_bell.py\")",
+      "PowerShell(python \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-USER-Desktop-KcopWeb\\\\328ca797-80a0-4edc-93ed-ee1129bf78a5\\\\scratchpad\\\\export_call_data.py\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\USER\\Desktop\\KcopWeb\\common",
