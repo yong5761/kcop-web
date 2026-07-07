@@ -12,7 +12,7 @@ router.get('/api/bells', async (req, res) => {
          b.phone_no, b.bell_name, b.region, b.address, b.lat, b.lng, b.machine_no,
          bl.last_seq, bl.voltage, bl.bellstatus, bl.fw_version, bl.last_seen,
          CASE
-           WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 30 MINUTE)
+           WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 1 HOUR)
            THEN '통신장애'
            ELSE '정상'
          END AS comm_state
@@ -51,8 +51,8 @@ router.get('/api/stats/summary', async (req, res) => {
     );
     const [[{ normal, fault }]] = await pool.execute(
       `SELECT
-         SUM(CASE WHEN bl.last_seen IS NOT NULL AND bl.last_seen >= (NOW() - INTERVAL 30 MINUTE) THEN 1 ELSE 0 END) AS normal,
-         SUM(CASE WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 30 MINUTE) THEN 1 ELSE 0 END) AS fault
+         SUM(CASE WHEN bl.last_seen IS NOT NULL AND bl.last_seen >= (NOW() - INTERVAL 1 HOUR) THEN 1 ELSE 0 END) AS normal,
+         SUM(CASE WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 1 HOUR) THEN 1 ELSE 0 END) AS fault
        FROM bells b
        LEFT JOIN bell_latest bl ON b.phone_no = bl.phone_no`
     );
