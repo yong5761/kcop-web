@@ -59,9 +59,30 @@ router.get('/api/stats/summary', async (req, res) => {
     const [[{ logs_24h }]] = await pool.execute(
       `SELECT COUNT(*) AS logs_24h FROM bell_logs WHERE received_at > NOW() - INTERVAL 1 DAY`
     );
-    res.json({ ok: true, total, normal, fault, logs_24h });
+    const [[{ alarm_active }]] = await pool.execute(
+      `SELECT COUNT(*) AS alarm_active FROM bell_events WHERE status = '경보발생' AND resolved_at IS NULL`
+    );
+    const [[{ alarm_today }]] = await pool.execute(
+      `SELECT COUNT(*) AS alarm_today FROM bell_events WHERE occurred_at >= CURDATE()`
+    );
+    res.json({ ok: true, total, normal, fault, logs_24h, alarm_active, alarm_today });
   } catch (e) {
     console.error('[API] GET /api/stats/summary error:', e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+router.get('/api/events', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT id, phone_no, machine_no, bell_name, region, address, bell_number, status, occurred_at, resolved_at
+       FROM bell_events
+       ORDER BY occurred_at DESC
+       LIMIT 200`
+    );
+    res.json({ ok: true, rows });
+  } catch (e) {
+    console.error('[API] GET /api/events error:', e.message);
     res.status(500).json({ ok: false, error: e.message });
   }
 });

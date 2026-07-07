@@ -114,7 +114,7 @@
         </div>
 
         <div class="seiren_box" style="padding-top:0px;">
-          <span class="no_b" style="float:right;">0</span>
+          <span class="no_b" id="bell-badge-unadjusted" style="float:right;">0</span>
           <p class="bg">
             <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
           </p>
@@ -122,12 +122,14 @@
         </div>
 
         <div class="seiren_box" style="padding-top:0px;">
-          <span class="no_b" style="float:right;">0</span>
+          <span class="no_b" id="bell-badge-alarm" style="float:right;">0</span>
           <p class="bg">
             <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
           </p>
           <p class="tt">경보발생</p>
         </div>
+
+        <div id="bell-summary" style="float:left; width:100%; font-size:13px; margin-top:8px; color:#333;"></div>
 
         <div class="bell-table-wrap">
           <table class="list" style="table-layout:fixed;width:100%;">
@@ -156,59 +158,17 @@
                 <th>조치내용</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>1<br><span style="color:blue;">870735</span></td>
-                <td>대구광역시 동구<br>이양루공원(통천사)</td>
-                <td><a href="#" target="googlemap">대구광역시 동구 효목동 3-11</a></td>
-                <td>2026-07-02 18:47:14<br><span style="color:red;"></span></td>
-                <td><a href="#" target="_top"><span class="red">경보발생 (01)</span></a></td>
-                <td>0</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>2<br><span style="color:blue;">870738</span></td>
-                <td>대구광역시 동구<br>외산루공원</td>
-                <td><a href="#" target="googlemap">대구광역시 동구 도평동 2-1</a></td>
-                <td>2026-07-02 16:20:32<br><span style="color:red;">외산루공원</span></td>
-                <td><a href="#" target="_top"><span class="red">경보발생 (01)</span></a></td>
-                <td>0</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>3<br><span style="color:blue;">416671</span></td>
-                <td>서울특별시 마포구<br>손기정체육공원</td>
-                <td><a href="#" target="googlemap">서울 마포구 만리동2가 6-1</a></td>
-                <td>2026-07-02 14:40:59<br><span style="color:red;"></span></td>
-                <td><a href="#" target="_top"><span class="red">경보발생 (01)</span></a></td>
-                <td>0</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>4<br><span style="color:blue;">282005</span></td>
-                <td>서울특별시 동대문구<br>장평고</td>
-                <td><a href="#" target="googlemap">서울 동대문구 장안1동 481-3</a></td>
-                <td>2026-07-02 13:25:11<br><span style="color:red;">장평고</span></td>
-                <td><a href="#" target="_top"><span class="red">경보발생 (02)</span></a></td>
-                <td>홍길동</td>
-                <td>2026-07-02 13:45:00</td>
-                <td>현장 출동 확인</td>
-              </tr>
-              <tr>
-                <td>5<br><span style="color:blue;">332005</span></td>
-                <td>서울특별시 은평구<br>불광근린공원</td>
-                <td><a href="#" target="googlemap">서울 은평구 불광동 산1-1</a></td>
-                <td>2026-07-02 08:20:44<br><span style="color:red;"></span></td>
-                <td><a href="#" target="_top"><span style="color:blue;">정상(복구)</span></a></td>
-                <td>이영희</td>
-                <td>2026-07-02 08:40:00</td>
-                <td>오작동 처리</td>
-              </tr>
-            </tbody>
+            <tbody id="bell-tbody"></tbody>
           </table>
+          <div class="c">
+            <div id="search">
+              <form name="searchForm" onsubmit="return false;">
+                <input type="text" name="sword" id="bell-sword" value="" placeholder="장소/이름 검색" class="input01" style="float:left;margin-left:10px;margin-right:5px;">
+                <span style="float:left;line-height:18px;" class="search_btn"><a href="#" onclick="doSearch();return false;">검색</a></span>
+              </form>
+              <span id="bell-paging"></span>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -233,6 +193,154 @@
         el.textContent = y + '.' + m + '.' + day;
       }
     })();
+
+    var allRows = [];
+    var filteredRows = [];
+    var currentPage = 1;
+    var PAGE_SIZE = 10;
+
+    function formatKST(isoStr) {
+      if (!isoStr) return '-';
+      var d = new Date(isoStr);
+      var kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+      var y = kst.getUTCFullYear();
+      var mo = String(kst.getUTCMonth() + 1).padStart(2, '0');
+      var day = String(kst.getUTCDate()).padStart(2, '0');
+      var h = String(kst.getUTCHours()).padStart(2, '0');
+      var mi = String(kst.getUTCMinutes()).padStart(2, '0');
+      var sec = String(kst.getUTCSeconds()).padStart(2, '0');
+      return y + '-' + mo + '-' + day + ' ' + h + ':' + mi + ':' + sec;
+    }
+
+    function applyFilter(sword) {
+      if (!sword) {
+        filteredRows = allRows.slice();
+        return;
+      }
+      var lc = sword.toLowerCase();
+      filteredRows = allRows.filter(function(r) {
+        var bellNameStr = r.bell_name != null ? r.bell_name.toLowerCase() : '';
+        var regionStr   = r.region   != null ? r.region.toLowerCase()   : '';
+        var addressStr  = r.address  != null ? r.address.toLowerCase()  : '';
+        return bellNameStr.indexOf(lc) !== -1
+            || regionStr.indexOf(lc)   !== -1
+            || addressStr.indexOf(lc)  !== -1;
+      });
+    }
+
+    function doSearch() {
+      var sword = document.getElementById('bell-sword').value.trim();
+      applyFilter(sword);
+      currentPage = 1;
+      renderPage();
+    }
+
+    function goToPage(n) {
+      var totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+      if (n < 1) n = 1;
+      if (n > totalPages) n = totalPages;
+      currentPage = n;
+      renderPage();
+    }
+
+    function renderPage() {
+      var tbody = document.getElementById('bell-tbody');
+      if (!tbody) return;
+      var totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+      var start = (currentPage - 1) * PAGE_SIZE;
+      var pageRows = filteredRows.slice(start, start + PAGE_SIZE);
+      var html = '';
+      for (var i = 0; i < pageRows.length; i++) {
+        var r = pageRows[i];
+        var no = start + i + 1;
+        var machineStr = r.machine_no != null ? '<br><span style="color:blue;">' + r.machine_no + '</span>' : '';
+        var nameCell;
+        if (r.region != null || r.bell_name != null) {
+          nameCell = (r.region != null ? r.region : '') + (r.bell_name != null ? '<br>' + r.bell_name : '');
+        } else {
+          nameCell = String(r.phone_no);
+        }
+        var statusCell;
+        if (r.status === '경보발생') {
+          statusCell = '<strong><span style="color:red;">경보발생</span></strong>';
+        } else if (r.status === '정상복구') {
+          statusCell = '<span style="color:blue;">정상복구</span>';
+        } else {
+          statusCell = r.status || '-';
+        }
+        html += '<tr>'
+          + '<td>' + no + machineStr + '</td>'
+          + '<td>' + nameCell + '</td>'
+          + '<td>' + (r.address != null ? r.address : '-') + '</td>'
+          + '<td>' + formatKST(r.occurred_at) + '</td>'
+          + '<td>' + statusCell + '</td>'
+          + '<td></td>'
+          + '<td></td>'
+          + '<td></td>'
+          + '</tr>';
+      }
+      if (html === '') {
+        html = '<tr><td colspan="8">등록된 정보가 없습니다</td></tr>';
+      }
+      tbody.innerHTML = html;
+      renderPaging(totalPages);
+    }
+
+    function renderPaging(totalPages) {
+      var el = document.getElementById('bell-paging');
+      if (!el) return;
+      var BLOCK = 10;
+      var blockStart = Math.floor((currentPage - 1) / BLOCK) * BLOCK + 1;
+      var blockEnd = Math.min(blockStart + BLOCK - 1, totalPages);
+      var html = '';
+      html += '<a href="#" onclick="goToPage(1);return false;"><img src="../common/img/common/paging_first.gif" alt="처음" onerror="this.outerHTML=\'&laquo;\';" /></a>';
+      html += '<a href="#" onclick="goToPage(' + (currentPage - 1) + ');return false;"><img src="../common/img/common/paging_prev.gif" alt="이전" onerror="this.outerHTML=\'&lsaquo;\';" /></a>';
+      for (var p = blockStart; p <= blockEnd; p++) {
+        if (p === currentPage) {
+          html += '<span class="num_ov"><a href="#" onclick="goToPage(' + p + ');return false;" style="text-decoration:none;">' + p + '</a></span> ';
+        } else {
+          html += '<span class="num"><a href="#" onclick="goToPage(' + p + ');return false;" style="text-decoration:none;"><strong style="font-size:12px;margin:0;color:#000000;">' + p + '</strong></a></span> ';
+        }
+      }
+      html += '<a href="#" onclick="goToPage(' + (currentPage + 1) + ');return false;"><img src="../common/img/common/paging_next.gif" alt="다음" onerror="this.outerHTML=\'&rsaquo;\';" /></a>';
+      html += '<a href="#" onclick="goToPage(' + totalPages + ');return false;"><img src="../common/img/common/paging_end.gif" alt="마지막" onerror="this.outerHTML=\'&raquo;\';" /></a>';
+      el.innerHTML = html;
+    }
+
+    function renderBadges(s) {
+      var unadj = document.getElementById('bell-badge-unadjusted');
+      var alarm  = document.getElementById('bell-badge-alarm');
+      if (unadj) unadj.textContent = s.alarm_active;
+      if (alarm)  alarm.textContent  = s.alarm_active;
+    }
+
+    function loadData() {
+      var savedPage  = currentPage;
+      var savedSword = document.getElementById('bell-sword') ? document.getElementById('bell-sword').value.trim() : '';
+
+      fetch('/api/events')
+        .then(function(res) { return res.json(); })
+        .then(function(j) {
+          if (!j.ok) throw new Error('ok:false');
+          allRows = j.rows;
+          applyFilter(savedSword);
+          var totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+          currentPage = Math.min(savedPage, totalPages);
+          renderPage();
+        })
+        .catch(function() {
+          var tbody = document.getElementById('bell-tbody');
+          if (tbody) tbody.innerHTML = '<tr><td colspan="8">데이터를 불러오지 못했습니다</td></tr>';
+        });
+
+      fetch('/api/stats/summary')
+        .then(function(res) { return res.json(); })
+        .then(function(j) { if (j.ok) renderBadges(j); })
+        .catch(function() {});
+    }
+
+    loadData();
+    setInterval(loadData, 30000);
   </script>
 
 </body>
