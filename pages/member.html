@@ -272,7 +272,7 @@ function renderMembers(rows) {
     }).join('');
   } else if (currentTab === 2) {
     thead.innerHTML =
-      '<tr><th>지역</th><th>지역관리명</th><th>아이디</th><th>대표전화</th><th>비고</th><th>수정/삭제</th></tr>';
+      '<tr><th width="24%">지역</th><th width="20%">지역관리명</th><th width="16%">아이디</th><th width="12%">대표전화</th><th width="16%">비고</th><th width="12%">수정/삭제</th></tr>';
     tbody.innerHTML = rows.map(function(r){
       return '<tr>' +
         '<td>' + getBigName(r.c1) + ' / ' + getJungName(r.c2) + '</td>' +
