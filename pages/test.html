@@ -70,13 +70,13 @@
       </div>
 
       <div class="seiren_box" style="padding-top:0px;">
-        <span class="no_b" style="float:right;">0</span>
+        <span id="test-badge-unadjusted" class="no_b" style="float:right;">0</span>
         <p class="bg"><img src="../common/img/common/seiren_icon.png" alt="" /></p>
         <p class="tt">미조치건</p>
       </div>
 
       <div class="seiren_box" style="padding-top:0px;">
-        <span class="no_b" style="float:right;">0</span>
+        <span id="test-badge-alarm" class="no_b" style="float:right;">0</span>
         <p class="bg"><img src="../common/img/common/seiren_icon.png" alt="" /></p>
         <p class="tt">경보발생</p>
       </div>
@@ -385,6 +385,18 @@
     cGen.style.display = isGen ? 'block' : 'none';
     cEs.style.display = isGen ? 'none' : 'block';
   }
+
+  fetch('/api/stats/summary')
+    .then(function(res) { return res.json(); })
+    .then(function(j) {
+      if (j.ok) {
+        var unadj = document.getElementById('test-badge-unadjusted');
+        var alarm = document.getElementById('test-badge-alarm');
+        if (unadj) unadj.textContent = j.alarm_active;
+        if (alarm) alarm.textContent = j.alarm_active;
+      }
+    })
+    .catch(function() {});
 </script>
 
 </body>

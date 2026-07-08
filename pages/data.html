@@ -127,7 +127,7 @@
         </p>
 
         <div class="seiren_box" style="padding-top:0px;">
-          <span class="no_b" style="float:right;">0</span>
+          <span id="data-badge-unadjusted" class="no_b" style="float:right;">0</span>
           <p class="bg">
             <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
           </p>
@@ -135,7 +135,7 @@
         </div>
 
         <div class="seiren_box" style="padding-top:0px;">
-          <span class="no_b" style="float:right;">0</span>
+          <span id="data-badge-alarm" class="no_b" style="float:right;">0</span>
           <p class="bg">
             <img src="../common/img/common/seiren_icon.png" alt="" onerror="this.style.display='none';">
           </p>
@@ -313,6 +313,10 @@
       var el = document.getElementById('data-summary');
       if (!el || !s) return;
       el.textContent = '총 ' + s.total + '건 | 정상 ' + s.normal + ' / 통신장애 ' + s.fault;
+      var unadj = document.getElementById('data-badge-unadjusted');
+      var alarm = document.getElementById('data-badge-alarm');
+      if (unadj) unadj.textContent = s.alarm_active;
+      if (alarm) alarm.textContent = s.alarm_active;
     }
 
     function loadData() {
