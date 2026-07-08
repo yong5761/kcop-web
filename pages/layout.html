@@ -12,7 +12,8 @@
   <style>
     * { font-family: 'Nanum Gothic', '나눔고딕', NanumGothic, verdana, 'Malgun Gothic', 맑은고딕, sans-serif; }
     #content #nav li img { vertical-align: middle; margin-right: 4px; }
-    .map-area { float: left; width: 50%; height: 540px; border-top: 2px solid #111; background-color: #c9d3dc; display: flex; align-items: center; justify-content: center; color: #6b7484; font-size: 18px; font-weight: 600; box-sizing: border-box; }
+    .map-area { float: left; width: 50%; height: 540px; border-top: 2px solid #111; background-color: #c9d3dc; box-sizing: border-box; overflow: hidden; }
+    #home-map { width: 100%; height: 100%; }
     .table-area { float: right; width: 50%; box-sizing: border-box; }
     .article-inner { width: 100%; float: left; }
   </style>
@@ -105,7 +106,7 @@
 
       <div id="article">
         <div class="article-inner">
-          <div class="map-area">지도 영역 (준비 중)</div>
+          <div class="map-area"><div id="home-map"></div></div>
           <div class="table-area">
             <ul class="tab">
               <li style="width:40%;" class="tab_ov" id="map1"><a href="#" onclick="MapType(1);return false">경보발생 최신 작동시간 리스트</a></li>
@@ -162,6 +163,94 @@
 
     var allRows = [];
     var currentTab = 1;
+
+    var homeMap = null;
+    var homeMarkers = [];
+    var homeInfowindow = null;
+    var mapSdkLoaded = false;
+    var mapSdkLoading = false;
+    var mapSdkCallbacks = [];
+
+    function loadMapSdk(cb) {
+      if (mapSdkLoaded) { cb(); return; }
+      mapSdkCallbacks.push(cb);
+      if (mapSdkLoading) return;
+      mapSdkLoading = true;
+      var s = document.createElement('script');
+      s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=4f8113e9d33b19b56daeda4b73e65b78&autoload=false';
+      s.onload = function () {
+        kakao.maps.load(function () {
+          mapSdkLoaded = true;
+          var fns = mapSdkCallbacks.slice();
+          mapSdkCallbacks = [];
+          fns.forEach(function (f) { try { f(); } catch (e) { console.error('[HomeMap]', e); } });
+        });
+      };
+      s.onerror = function () { console.error('[HomeMap] SDK load failed'); };
+      document.head.appendChild(s);
+    }
+
+    function initHomeMap(cb) {
+      loadMapSdk(function () {
+        if (!homeMap) {
+          var container = document.getElementById('home-map');
+          homeMap = new kakao.maps.Map(container, {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 8
+          });
+          homeInfowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+        }
+        if (cb) cb();
+      });
+    }
+
+    function renderMapMarkers(rows) {
+      if (!homeMap) {
+        initHomeMap(function () { renderMapMarkers(rows); });
+        return;
+      }
+      homeMarkers.forEach(function (m) { m.setMap(null); });
+      homeMarkers = [];
+      homeInfowindow.close();
+
+      var filtered = rows.filter(function (r) {
+        var la = parseFloat(r.lat);
+        var lo = parseFloat(r.lng);
+        return la && lo && la !== 0 && lo !== 0;
+      });
+
+      if (filtered.length === 0) {
+        homeMap.setCenter(new kakao.maps.LatLng(37.5665, 126.9780));
+        homeMap.setLevel(8);
+        return;
+      }
+
+      var bounds = new kakao.maps.LatLngBounds();
+
+      filtered.forEach(function (r) {
+        var pos = new kakao.maps.LatLng(parseFloat(r.lat), parseFloat(r.lng));
+        var marker = new kakao.maps.Marker({ map: homeMap, position: pos });
+        var infoContent = '<div style="padding:6px 10px;font-size:12px;line-height:1.6;">'
+          + '<strong>' + (r.bell_name || String(r.phone_no)) + '</strong>'
+          + '<br>' + formatKST(r.occurred_at)
+          + '</div>';
+        (function (m, c) {
+          kakao.maps.event.addListener(m, 'click', function () {
+            homeInfowindow.setContent(c);
+            homeInfowindow.open(homeMap, m);
+          });
+        })(marker, infoContent);
+        homeMarkers.push(marker);
+        bounds.extend(pos);
+      });
+
+      if (filtered.length === 1) {
+        homeMap.setCenter(new kakao.maps.LatLng(parseFloat(filtered[0].lat), parseFloat(filtered[0].lng)));
+        homeMap.setLevel(5);
+      } else {
+        homeMap.setBounds(bounds);
+      }
+    }
 
     function formatKST(isoStr) {
       if (!isoStr) return '-';
@@ -246,6 +335,7 @@
           if (!j.ok) throw new Error('ok:false');
           allRows = j.rows;
           MapType(currentTab);
+          renderMapMarkers(allRows);
         })
         .catch(function () {
           var tbody = document.getElementById('layout-tbody');
@@ -258,6 +348,7 @@
         .catch(function () {});
     }
 
+    initHomeMap();
     loadData();
     setInterval(loadData, 30000);
   </script>
