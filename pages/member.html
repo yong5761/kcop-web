@@ -270,10 +270,22 @@ function renderMembers(rows) {
         '<td>' + editDelBtns(r.idx) + '</td>' +
         '</tr>';
     }).join('');
-  } else {
-    var label = currentTab === 2 ? '관리자명' : '조치자명';
+  } else if (currentTab === 2) {
     thead.innerHTML =
-      '<tr><th>' + label + '</th><th>아이디</th><th>전화번호</th><th>지역</th><th>구/군</th><th>비고</th><th>수정/삭제</th></tr>';
+      '<tr><th>지역</th><th>지역관리명</th><th>아이디</th><th>대표전화</th><th>비고</th><th>수정/삭제</th></tr>';
+    tbody.innerHTML = rows.map(function(r){
+      return '<tr>' +
+        '<td>' + getBigName(r.c1) + ' / ' + getJungName(r.c2) + '</td>' +
+        '<td>' + esc(r.mem_name)       + '</td>' +
+        '<td>' + esc(r.mem_id)         + '</td>' +
+        '<td>' + esc(r.mem_tel || '-') + '</td>' +
+        '<td>' + esc(r.etc_value || '-') + '</td>' +
+        '<td>' + editDelBtns(r.idx) + '</td>' +
+        '</tr>';
+    }).join('');
+  } else {
+    thead.innerHTML =
+      '<tr><th>조치자명</th><th>아이디</th><th>전화번호</th><th>지역</th><th>구/군</th><th>비고</th><th>수정/삭제</th></tr>';
     tbody.innerHTML = rows.map(function(r){
       return '<tr>' +
         '<td>' + esc(r.mem_name)       + '</td>' +
