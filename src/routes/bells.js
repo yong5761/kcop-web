@@ -90,4 +90,53 @@ router.get('/api/events', async (req, res) => {
   }
 });
 
+router.get('/api/bells/:phone/last-packet', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      `SELECT phone_no, received_at, raw_msg, bellnumber, bellstatus
+       FROM bell_logs WHERE phone_no = ? ORDER BY received_at DESC LIMIT 1`,
+      [req.params.phone]
+    );
+    if (rows.length === 0) return res.json({ ok: true, data: null });
+
+    const row = rows[0];
+    const raw = row.raw_msg;
+
+    if (!raw || raw.length !== 40) return res.json({ ok: true, data: null });
+
+    const buf = Buffer.from(raw, 'hex');
+    const lng        = buf.readUInt8(0);
+    const phonenumber= buf.readUInt32LE(1);
+    const bellnumber = buf.readUInt8(5);
+    const seqnum     = buf.readUInt8(6);
+    const voltage    = buf.readUInt8(7);
+    const bellstatus = buf.readUInt32LE(8);
+    const machinenum = buf.readUInt32LE(12);
+    const rsv1       = buf.readUInt8(16);
+    const rsv2       = buf.readUInt8(17);
+    const fw_version = buf.readUInt8(18);
+    const chksum     = buf.readUInt8(19);
+
+    let xor = 0;
+    for (let i = 0; i < 19; i++) xor ^= buf.readUInt8(i);
+    const checksum_ok = xor === chksum;
+
+    res.json({
+      ok: true,
+      data: {
+        phone_no:    row.phone_no,
+        received_at: row.received_at,
+        raw_msg:     raw,
+        lng, phonenumber, bellnumber, seqnum, voltage,
+        bellstatus, machinenum, rsv1, rsv2, fw_version, chksum,
+        checksum_ok,
+        is_alarm: bellnumber !== 0,
+      },
+    });
+  } catch (e) {
+    console.error('[API] GET /api/bells/:phone/last-packet error:', e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 module.exports = router;
