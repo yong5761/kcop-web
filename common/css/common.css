@@ -75,7 +75,7 @@ body {background-color:#4b637f;  }
 
 /*ë‹¤ë¥¸íŽ˜ì´ì§€*/
 
-#content2  {box-sizing: border-box; -moz-box-sizing: border-box; width:100%; background-color:#fff; float:left; }
+#content2  {box-sizing: border-box; -moz-box-sizing: border-box; width:100%; background-color:#fff; float:left; min-height:100vh; }
 
 #content2 #nav  {float:left; height:100%; width:15%;  background-color:#fff; }
 #content2 #nav ul {float:left; border-top:1px solid #ddd;}
