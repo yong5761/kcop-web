@@ -242,8 +242,6 @@
     }
   })();
 
-  var publishHistory = [];
-
   function mqttPublish() {
     var topic = document.getElementById('mqtt-topic').value.trim();
     var payload = document.getElementById('mqtt-payload').value;
@@ -290,12 +288,8 @@
 
   function appendResult(type, msg) {
     var color = type === 'ok' ? '#1a7a1a' : type === 'err' ? '#cc0000' : '#b8860b';
-    publishHistory.unshift({ color: color, msg: msg });
-    if (publishHistory.length > 20) publishHistory.length = 20;
     var el = document.getElementById('mqtt-result');
-    el.innerHTML = publishHistory.map(function (h) {
-      return '<div style="color:' + h.color + '; padding:2px 0;">' + escHtml(h.msg) + '</div>';
-    }).join('');
+    el.innerHTML = '<div style="color:' + color + '; padding:2px 0;">' + escHtml(msg) + '</div>';
   }
 
   function escHtml(s) {
