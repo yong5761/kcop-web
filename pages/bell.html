@@ -13,6 +13,7 @@
     .bell-table-wrap { width: 100%; float: left; clear: both; background-color: #fff; margin-top: 20px; height: 600px; overflow-y: auto; box-sizing: border-box; }
   </style>
   <script src="../common/js/jquery-1.7.1.min.js"></script>
+  <script src="../common/js/kcop-auth.js"></script>
 </head>
 <body>
 
@@ -30,7 +31,7 @@
               </div>
             </td>
             <td style="float:right;">
-              <a href="login.html" title="">
+              <a href="#" onclick="doLogout();return false;" title="">
                 <img src="../common/img/common/logout_btn.png" alt="로그아웃" style="margin-top:2px;"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='inline';">
                 <span style="display:none;">로그아웃</span>

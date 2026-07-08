@@ -30,6 +30,41 @@ app.use(session({
   }
 }));
 
+// 인증 게이트 (session 다음, static 앞에 위치해야 함)
+const STATIC_EXTS = /\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|map)$/i;
+app.use(function authGate(req, res, next) {
+  const p = req.path;
+
+  // 루트: 로그인 여부에 따라 분기
+  if (p === '/') {
+    return (req.session && req.session.user)
+      ? res.redirect('/pages/bell.html')
+      : res.redirect('/pages/login.html');
+  }
+
+  // 로그인 페이지: 이미 로그인한 경우 첫 화면으로
+  if (p === '/pages/login.html') {
+    if (req.session && req.session.user) return res.redirect('/pages/bell.html');
+    return next();
+  }
+
+  // 항상 허용: 인증 API
+  if ((req.method === 'POST' && (p === '/api/login' || p === '/api/logout')) ||
+      (req.method === 'GET'  && (p === '/api/me'   || p === '/api/health'))) {
+    return next();
+  }
+
+  // 항상 허용: 정적 자원 (common/**, 또는 정적 확장자)
+  if (p.startsWith('/common/') || STATIC_EXTS.test(p)) return next();
+
+  // 나머지: 로그인 필요
+  if (req.session && req.session.user) return next();
+
+  return p.startsWith('/api/')
+    ? res.status(401).json({ ok: false, error: '로그인이 필요합니다.' })
+    : res.redirect('/pages/login.html');
+});
+
 app.use(express.static(path.join(__dirname)));
 
 app.use('/', require('./src/routes/auth'));

@@ -10,6 +10,7 @@
 <link href="../common/css/common.css" type="text/css" rel="stylesheet" media="screen" />
 <script src="../common/js/jquery-1.7.1.min.js" language="JavaScript" type="text/javascript"></script>
 <script src="../common/js/euckr.js" type="text/javascript"></script>
+<script src="../common/js/kcop-auth.js"></script>
 <style>
 .rmt-tgl{display:inline-block;width:36px;height:20px;background:#c8c8c8;border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;vertical-align:middle;}
 .rmt-tgl.on{background:#4b637f;}
@@ -37,7 +38,7 @@
             <label for="switch2" data-on-label="ON" data-off-label="OFF"></label>
           </div>
         </td>
-        <td style="float:right;"><a href="login.html" title=""><img src="../common/img/common/logout_btn.png" alt="로그아웃" style="margin-top:2px;" /></a></td>
+        <td style="float:right;"><a href="#" onclick="doLogout();return false;" title=""><img src="../common/img/common/logout_btn.png" alt="로그아웃" style="margin-top:2px;" /></a></td>
         <td style="float:right;"><img src="../common/img/common/top_icon.png" alt="" style="margin-top:5px;" />&nbsp; <a href="#" onclick="return false;" target="space">프로그래머</a></td>
         <td style="float:right;"><a href="#" onclick="return false;" target="space">공지사항 &nbsp;<span class="no" style="float:right;">0</span></a></td>
       </tr>
