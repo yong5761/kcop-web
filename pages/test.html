@@ -11,11 +11,11 @@
 <script src="../common/js/jquery-1.7.1.min.js" language="JavaScript" type="text/javascript"></script>
 <style>
 .rmt-tgl{display:inline-block;width:36px;height:20px;background:#c8c8c8;border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;vertical-align:middle;}
-.rmt-tgl.on{background:#6b7484;}
+.rmt-tgl.on{background:#4b637f;}
 .rmt-tgl-knob{display:block;width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
 .rmt-tgl.on .rmt-tgl-knob{left:18px;}
-.rmt-inp{padding:3px 6px;border:1px solid #b4b4b4;background:#fff;font-size:13px;box-sizing:border-box;}
-.rmt-inp:focus{outline:2px solid #4a90d9;outline-offset:0;border-color:#4a90d9;}
+.rmt-inp{padding:3px 6px;border:1px solid #a9b0ba;background:#fff;font-size:13px;box-sizing:border-box;}
+.rmt-inp:focus{outline:2px solid #4b637f;outline-offset:0;border-color:#4b637f;}
 .rmt-ro{padding:3px 6px;border:1px solid #b4b4b4;background:#dcdcdc;font-size:13px;color:#555;box-sizing:border-box;}
 .rmt-lbl{font-size:11px;color:#555;display:block;margin-bottom:2px;}
 @media(max-width:680px){.rmt-ip-row{flex-wrap:wrap !important;gap:4px !important;}.rmt-form-table td{display:block !important;width:100% !important;padding-left:0 !important;}}
@@ -79,15 +79,15 @@
       </div>
 
       <div style="width:99.9%; float:left; background-color:#fff; margin-top:20px; padding:20px 24px; box-sizing:border-box;">
-        <div style="max-width:860px; border:1px solid #b8b8b8; border-radius:3px; overflow:hidden;">
-          <div style="background:#6b7484; color:#fff; font-size:14px; font-weight:600; padding:9px 14px;">멀티벨 단말 원격설정</div>
-          <div style="display:flex; background:#d4d4d4; border-bottom:2px solid #a4a4a4;">
-            <div style="padding:6px 18px; font-size:13px; font-weight:600; background:#f0f0f0; border:1px solid #a4a4a4; border-bottom:none; margin-bottom:-2px; cursor:default;">일반설정</div>
-            <div style="padding:6px 18px; font-size:13px; color:#888; cursor:default;">음성인식</div>
-            <div style="padding:6px 18px; font-size:13px; color:#888; cursor:default;">다우테크</div>
-            <div style="padding:6px 18px; font-size:13px; color:#888; cursor:default;">이지사운드</div>
+        <div style="width:100%; border:1px solid #dfe3e8; border-radius:2px; overflow:hidden;">
+          <div style="background:#4b637f; color:#fff; font-size:14px; font-weight:600; padding:9px 14px;">멀티벨 단말 원격설정</div>
+          <div style="display:flex; background:#e0e4eb; border-bottom:2px solid #4b637f;">
+            <div style="padding:7px 18px; font-size:13px; font-weight:600; background:#fff; border-bottom:2px solid #fff; margin-bottom:-2px; cursor:default; color:#4b637f;">일반설정</div>
+            <div style="padding:7px 18px; font-size:13px; color:#888; cursor:default;">음성인식</div>
+            <div style="padding:7px 18px; font-size:13px; color:#888; cursor:default;">다우테크</div>
+            <div style="padding:7px 18px; font-size:13px; color:#888; cursor:default;">이지사운드</div>
           </div>
-          <div style="background:#f0f0f0; padding:14px 18px;">
+          <div style="background:#fff; padding:14px 18px;">
             <table class="rmt-form-table" style="border-collapse:collapse; font-size:13px; color:#333;">
               <tr>
                 <td style="padding:4px 8px 4px 0; white-space:nowrap; width:110px;">TEL1</td>
@@ -176,7 +176,7 @@
                 </td>
               </tr>
             </table>
-            <div style="margin-top:12px; padding-top:10px; border-top:1px solid #c8c8c8; display:flex; flex-direction:column; gap:8px;">
+            <div style="margin-top:12px; padding-top:10px; border-top:1px solid #dfe3e8; display:flex; flex-direction:column; gap:8px;">
               <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:13px; color:#333;">
                 <span class="rmt-tgl" onclick="rmtTgl(this,'tglTel12')"><span class="rmt-tgl-knob"></span></span>
                 <input type="checkbox" id="tglTel12" style="display:none;">
