@@ -206,8 +206,9 @@
         ? '<strong><span style="color:#cc0000;">통신장애</span></strong>'
         : '<span style="color:#2244aa;">' + (r.comm_state || '-') + '</span>';
       var lastSeenStr = formatLastSeen(r.last_seen);
+      var fw = (r.fw_version != null && r.fw_version !== '') ? ' (' + r.fw_version + ')' : '';
       var lastSeenCell = lastSeenStr
-        ? '<span style="color:' + (isFault ? '#cc0000' : '#2244aa') + ';">' + lastSeenStr + '</span>'
+        ? '<span style="color:' + (isFault ? '#cc0000' : '#2244aa') + ';">' + lastSeenStr + fw + '</span>'
         : '<strong><span style="color:#cc0000;">수신데이타 없음</span></strong>';
       html += '<tr>'
         + '<td>-</td>'
