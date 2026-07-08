@@ -9,6 +9,7 @@
 <link href="../common/css/default.css" type="text/css" rel="stylesheet" media="screen" />
 <link href="../common/css/common.css" type="text/css" rel="stylesheet" media="screen" />
 <script src="../common/js/jquery-1.7.1.min.js" language="JavaScript" type="text/javascript"></script>
+<script src="../common/js/euckr.js" type="text/javascript"></script>
 <style>
 .rmt-tgl{display:inline-block;width:36px;height:20px;background:#c8c8c8;border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;vertical-align:middle;}
 .rmt-tgl.on{background:#4b637f;}
@@ -346,29 +347,27 @@
   function rmtSave() {
     var g = function(id) { return document.getElementById(id); };
     var s = function(id) { return g(id).value; };
-    var n = function(id) { var v = Number(g(id).value); return isNaN(v) ? 0 : v; };
+    var numOr0 = function(v) { var n = Number(v); return isNaN(n) ? 0 : n; };
 
     var devNo = s('devNo').trim();
     var topic = 'multibell/sm_' + devNo;
     var payload = {
       op: 101,
-      pnum: devNo,
-      set: {
-        tel1: s('tel1'), tel2: s('tel2'), tel3: s('tel3'), tel4: s('tel4'), tel5: s('tel5'),
-        sms: s('sms'),
-        uid: s('uid'),
-        bellhold: n('bellhold'),
-        tx700: n('tx700'),
-        serverip: s('ip1') + '.' + s('ip2') + '.' + s('ip3') + '.' + s('ip4'),
-        port: n('port'),
-        noresp: n('noresp'),
-        screem: n('screemStd'),
-        phone: n('phone'),
-        mic: n('mic'),
-        reset: n('resetInterval'),
-        tel12div: g('tglTel12').checked,
-        smsbell: g('tglSmsBell').checked
-      }
+      m: euckrHex(s('sms')),
+      t1: s('tel1'), t2: s('tel2'), t3: s('tel3'), t4: s('tel4'), t5: s('tel5'),
+      machineIdx: 'HK',
+      machineNum: numOr0(s('uid')),
+      duration: Math.max(0, numOr0(s('bellhold')) - 10),
+      tx700set: numOr0(s('tx700')),
+      serverip: [numOr0(s('ip1')), numOr0(s('ip2')), numOr0(s('ip3')), numOr0(s('ip4'))],
+      serverport: numOr0(s('port')),
+      screemref: numOr0(s('screemStd')),
+      phonevol: numOr0(s('phone')),
+      phonemic: numOr0(s('mic')),
+      resetinterval: numOr0(s('resetInterval')),
+      bell_even_odd: g('tglTel12').checked ? 1 : 0,
+      noanswertime: numOr0(s('noresp')),
+      addsmsbellnum: g('tglSmsBell').checked ? 1 : 0
     };
 
     g('mqtt-topic').value = topic;
