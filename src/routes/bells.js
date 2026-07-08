@@ -75,9 +75,12 @@ router.get('/api/stats/summary', async (req, res) => {
 router.get('/api/events', async (req, res) => {
   try {
     const [rows] = await pool.execute(
-      `SELECT id, phone_no, machine_no, bell_name, region, address, bell_number, status, occurred_at, resolved_at
-       FROM bell_events
-       ORDER BY occurred_at DESC
+      `SELECT e.id, e.phone_no, e.machine_no, e.bell_name, e.region, e.address,
+              e.bell_number, e.status, e.occurred_at, e.resolved_at,
+              b.lat, b.lng
+       FROM bell_events e
+       LEFT JOIN bells b ON e.phone_no = b.phone_no
+       ORDER BY e.occurred_at DESC
        LIMIT 200`
     );
     res.json({ ok: true, rows });
