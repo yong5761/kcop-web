@@ -83,12 +83,17 @@
           <div style="background:#4b637f; color:#fff; font-size:14px; font-weight:600; padding:9px 14px;">멀티벨 단말 원격설정</div>
           <div style="display:flex; background:#e0e4eb; border-bottom:2px solid #4b637f;">
             <div style="padding:7px 18px; font-size:13px; font-weight:600; background:#fff; border-bottom:2px solid #fff; margin-bottom:-2px; cursor:default; color:#4b637f;">일반설정</div>
-            <div style="padding:7px 18px; font-size:13px; color:#888; cursor:default;">음성인식</div>
-            <div style="padding:7px 18px; font-size:13px; color:#888; cursor:default;">다우테크</div>
             <div style="padding:7px 18px; font-size:13px; color:#888; cursor:default;">이지사운드</div>
           </div>
           <div style="background:#fff; padding:14px 18px;">
             <table class="rmt-form-table" style="border-collapse:collapse; font-size:13px; color:#333;">
+              <tr>
+                <td style="padding:4px 8px 8px 0; white-space:nowrap; width:110px; font-weight:600; color:#4b637f;">대상 단말</td>
+                <td colspan="3" style="padding:4px 0 8px 0; border-bottom:1px solid #dfe3e8;">
+                  <input id="devNo" type="text" value="01241715531" class="rmt-inp" style="width:160px;">
+                  <span style="margin-left:8px; color:#bbb; font-size:11px;">토픽 multibell/sm_{번호} + payload pnum 에 사용</span>
+                </td>
+              </tr>
               <tr>
                 <td style="padding:4px 8px 4px 0; white-space:nowrap; width:110px;">TEL1</td>
                 <td style="padding:4px 16px 4px 0;"><input id="tel1" type="text" value="0" class="rmt-inp" style="width:160px;"></td>
@@ -187,6 +192,9 @@
                 <input type="checkbox" id="tglSmsBell" style="display:none;">
                 SMS 벨번호 추가
               </label>
+            </div>
+            <div style="margin-top:14px;">
+              <button id="rmtSaveBtn" onclick="rmtSave();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">저장</button>
             </div>
           </div>
         </div>
@@ -313,6 +321,38 @@
       var prev = document.getElementById(prevId);
       if (prev) { prev.focus(); prev.select(); }
     }
+  }
+
+  function rmtSave() {
+    var g = function(id) { return document.getElementById(id); };
+    var s = function(id) { return g(id).value; };
+    var n = function(id) { var v = Number(g(id).value); return isNaN(v) ? 0 : v; };
+
+    var devNo = s('devNo').trim();
+    var topic = 'multibell/sm_' + devNo;
+    var payload = {
+      op: 101,
+      pnum: devNo,
+      set: {
+        tel1: s('tel1'), tel2: s('tel2'), tel3: s('tel3'), tel4: s('tel4'), tel5: s('tel5'),
+        sms: s('sms'),
+        uid: s('uid'),
+        bellhold: n('bellhold'),
+        tx700: n('tx700'),
+        serverip: s('ip1') + '.' + s('ip2') + '.' + s('ip3') + '.' + s('ip4'),
+        port: n('port'),
+        noresp: n('noresp'),
+        screem: n('screemStd'),
+        phone: n('phone'),
+        mic: n('mic'),
+        reset: n('resetInterval'),
+        tel12div: g('tglTel12').checked,
+        smsbell: g('tglSmsBell').checked
+      }
+    };
+
+    g('mqtt-topic').value = topic;
+    g('mqtt-payload').value = JSON.stringify(payload);
   }
 </script>
 
