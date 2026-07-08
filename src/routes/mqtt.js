@@ -1,0 +1,32 @@
+'use strict';
+
+const { Router } = require('express');
+const mqtt = require('mqtt');
+
+const router = Router();
+
+const publishClient = mqtt.connect(process.env.MQTT_URL || 'mqtt://localhost:1883');
+
+publishClient.on('connect', () => {
+  console.log('[MQTT publish client] connected');
+});
+
+publishClient.on('error', (err) => {
+  console.error('[MQTT publish client] error:', err.message);
+});
+
+router.post('/api/mqtt/publish', (req, res) => {
+  const { topic, payload } = req.body;
+  if (!topic || payload == null) {
+    return res.status(400).json({ ok: false, error: 'topic과 payload 필요' });
+  }
+  console.log('[MQTT publish]', topic, payload);
+  publishClient.publish(topic, String(payload), { qos: 0 }, (err) => {
+    if (err) {
+      return res.status(500).json({ ok: false, error: err.message });
+    }
+    res.json({ ok: true, topic, payload, published_at: new Date().toISOString() });
+  });
+});
+
+module.exports = router;
