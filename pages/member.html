@@ -9,6 +9,25 @@
 <link href="../common/css/default.css" type="text/css" rel="stylesheet" media="screen" />
 <link href="../common/css/common.css" type="text/css" rel="stylesheet" media="screen" />
 <script src="../common/js/jquery-1.7.1.min.js" language="JavaScript" type="text/javascript"></script>
+<style>
+#modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:9999;align-items:flex-start;justify-content:center;}
+#modal-box{background:#fff;width:450px;margin-top:70px;border-radius:4px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.mhd{background:#4b637f;color:#fff;padding:10px 16px;font-size:14px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;}
+.mhd .mcls{cursor:pointer;font-size:18px;line-height:1;opacity:.8;}
+.mhd .mcls:hover{opacity:1;}
+.mbody{padding:16px 18px;}
+.mrow{display:flex;align-items:center;margin-bottom:10px;}
+.mrow label{width:90px;font-size:13px;color:#555;flex-shrink:0;}
+.mrow input,.mrow select{flex:1;padding:5px 8px;border:1px solid #ccc;font-size:13px;border-radius:2px;box-sizing:border-box;}
+.mrow input[readonly]{background:#f0f0f0;color:#888;cursor:default;}
+.mft{display:flex;gap:8px;justify-content:flex-end;padding:10px 16px;background:#f5f5f5;border-top:1px solid #e0e0e0;}
+.mft button{padding:6px 20px;font-size:13px;cursor:pointer;border:none;border-radius:3px;}
+.btn-sv{background:#4b637f;color:#fff;}
+.btn-sv:hover{background:#3a5068;}
+.btn-cl{background:#999;color:#fff;}
+.btn-cl:hover{background:#777;}
+#table-body td{font-size:12px;}
+</style>
 </head>
 <body>
 
@@ -52,11 +71,11 @@
 
       <div class="guide">
         <span class="t1">K캅경비구역</span><br>
-        <span class="t2">본사관리자 등록/관리</span>
+        <span class="t2" id="guide-sub">본사관리자 등록/관리</span>
       </div>
 
       <p class="write_btn">
-        <span class="link_btn_bg"><a href="#" onclick="return false;" target="space"><img src="../common/img/common/write_icon.png" alt="" />&nbsp; 관리자등록</a></span>
+        <span class="link_btn_bg"><a href="#" onclick="openRegModal(); return false;"><img src="../common/img/common/write_icon.png" alt="" />&nbsp; <span id="reg-btn-label">관리자등록</span></a></span>
       </p>
 
       <div class="seiren_box" style="padding-top:0px;">
@@ -72,127 +91,462 @@
       </div>
 
       <ul class="tab tm20">
-        <li style="width:15%;" class="tab_ov"><a href="member.html" title="">본사관리자</a></li>
-        <li style="width:15%;" class="tab_"><a href="#" onclick="return false;" title="">지역관리자</a></li>
-        <li style="width:15%;" class="tab_"><a href="#" onclick="return false;" title="">조치자</a></li>
-        <li style="width:15%;" class="tab_"><a href="#" onclick="return false;" title="">지역 카테고리</a></li>
-        <li style="width:15%;" class="tab_"><a href="#" onclick="return false;" title="">구/군 카테고리</a></li>
+        <li id="memtab-1" style="width:15%;" class="tab_ov"><a href="#" onclick="switchTab(1); return false;">본사관리자</a></li>
+        <li id="memtab-2" style="width:15%;" class="tab_"><a href="#" onclick="switchTab(2); return false;">지역관리자</a></li>
+        <li id="memtab-3" style="width:15%;" class="tab_"><a href="#" onclick="switchTab(3); return false;">조치자</a></li>
+        <li id="memtab-4" style="width:15%;" class="tab_"><a href="#" onclick="switchTab(4); return false;">지역 카테고리</a></li>
+        <li id="memtab-5" style="width:15%;" class="tab_"><a href="#" onclick="switchTab(5); return false;">구/군 카테고리</a></li>
       </ul>
 
       <div style="width:99.9%; float:left; background-color:#fff; margin-top:0px; height:400px; overflow-y:auto;">
-        <table class="list">
-          <tr>
-            <th width="15%">본사관리자명</th>
-            <th width="15%">관리자아이디</th>
-            <th width="30%">비고</th>
-            <th width="20%">수정/삭제</th>
-          </tr>
-          <tr>
-            <td>sdf</td>
-            <td>fsdfsd231312231</td>
-            <td>-</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
-          <tr>
-            <td>abcde</td>
-            <td>abcde</td>
-            <td>-</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
-          <tr>
-            <td>dasdasd</td>
-            <td>dasdas2312312</td>
-            <td>fsdfsd</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
-          <tr>
-            <td>test1</td>
-            <td>wjdaksrl</td>
-            <td>1111</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
-          <tr>
-            <td>GS인증</td>
-            <td>hksystemgs</td>
-            <td>-</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
-          <tr>
-            <td>유비트정보통신</td>
-            <td>admin87</td>
-            <td>-</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
-          <tr>
-            <td>본사관리자</td>
-            <td>kcop</td>
-            <td>-</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
-          <tr>
-            <td>프로그래머</td>
-            <td>kcopadm</td>
-            <td>개발자</td>
-            <td>
-              <span class="link_btn_bg_s"><a href="#" onclick="return false;" target="space">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span>
-            </td>
-          </tr>
+        <table class="list" id="main-table">
+          <thead id="table-head"></thead>
+          <tbody id="table-body">
+            <tr><td style="text-align:center;padding:20px;color:#888;">로딩 중...</td></tr>
+          </tbody>
         </table>
       </div>
 
-      <div id="search"><form name=searchForm method=get action="#">
-        <select class="select01" name="sw">
-          <option value="mem_name">관리자명</option>
-          <option value="mem_id">아이디</option>
-        </select>
-        <input type="text" class="input01" style="width:40%;" name="sword" value="" />
-        <span class="search_btn"><a href="#" onclick="return false;">검색</a></span>
-      </form></div>
+      <div id="search">
+        <form name="searchForm" onsubmit="doSearch(); return false;">
+          <select class="select01" id="sw" name="sw">
+            <option value="mem_name">관리자명</option>
+            <option value="mem_id">아이디</option>
+          </select>
+          <input type="text" class="input01" style="width:40%;" id="sword" name="sword" value="" />
+          <span class="search_btn"><a href="#" onclick="doSearch(); return false;">검색</a></span>
+        </form>
+      </div>
 
     </div>
   </div>
 
   <div class="footer"><img src="../common/img/common/copy.png" alt="" /></div>
+</div>
 
+<!-- 등록/수정 모달 -->
+<div id="modal-overlay" onclick="overlayClick(event)">
+  <div id="modal-box">
+    <div class="mhd">
+      <span id="modal-title">등록</span>
+      <span class="mcls" onclick="closeModal()">&#10005;</span>
+    </div>
+    <div class="mbody" id="modal-fields"></div>
+    <div class="mft">
+      <button class="btn-sv" onclick="saveModal()">저장</button>
+      <button class="btn-cl" onclick="closeModal()">취소</button>
+    </div>
+  </div>
 </div>
 
 <script type="text/javascript">
-  (function () {
-    var d = new Date();
-    var el = document.getElementById('topDate');
-    if (el) {
-      var y = d.getFullYear();
-      var m = String(d.getMonth() + 1).padStart(2, '0');
-      var day = String(d.getDate()).padStart(2, '0');
-      el.textContent = y + '.' + m + '.' + day;
-    }
-  })();
+// ── 상태 ──────────────────────────────────────────────────────────────────────
+var bigCartData  = [];
+var jungCartData = [];
+var currentTab   = 1;
+var currentRows  = [];
+var rowMap       = {};
+var editIdx      = null;
 
-  fetch('/api/stats/summary')
-    .then(function(res) { return res.json(); })
-    .then(function(j) {
-      if (j.ok) {
-        var unadj = document.getElementById('member-badge-unadjusted');
-        var alarm = document.getElementById('member-badge-alarm');
-        if (unadj) unadj.textContent = j.alarm_active;
-        if (alarm) alarm.textContent = j.alarm_active;
-      }
-    })
-    .catch(function() {});
+var tabLabels = {1:'본사관리자', 2:'지역관리자', 3:'조치자', 4:'지역 카테고리', 5:'구/군 카테고리'};
+var regLabels = {1:'관리자등록', 2:'관리자등록', 3:'조치자등록', 4:'지역등록', 5:'구/군등록'};
+
+// ── 초기화 ────────────────────────────────────────────────────────────────────
+(function () {
+  var d = new Date();
+  var el = document.getElementById('topDate');
+  if (el) el.textContent = d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+})();
+
+var _initCnt = 0;
+function _tryInit() { if (++_initCnt === 2) switchTab(1); }
+
+fetch('/api/members/big-cart')
+  .then(function(r){return r.json();})
+  .then(function(j){ if(j.ok) bigCartData = j.rows; _tryInit(); })
+  .catch(_tryInit);
+
+fetch('/api/members/jung-cart')
+  .then(function(r){return r.json();})
+  .then(function(j){ if(j.ok) jungCartData = j.rows; _tryInit(); })
+  .catch(_tryInit);
+
+fetch('/api/stats/summary')
+  .then(function(r){return r.json();})
+  .then(function(j){
+    if(j.ok){
+      var u = document.getElementById('member-badge-unadjusted');
+      var a = document.getElementById('member-badge-alarm');
+      if(u) u.textContent = j.alarm_active;
+      if(a) a.textContent = j.alarm_active;
+    }
+  }).catch(function(){});
+
+// ── 유틸 ──────────────────────────────────────────────────────────────────────
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getBigName(num) {
+  var f = bigCartData.filter(function(b){ return b.big_num == num; })[0];
+  return f ? esc(f.big_name) : String(num||'-');
+}
+
+function getJungName(num) {
+  var f = jungCartData.filter(function(j){ return j.jung_num == num; })[0];
+  return f ? esc(f.jung_name) : String(num||'-');
+}
+
+function gv(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+
+// ── 탭 전환 ──────────────────────────────────────────────────────────────────
+function switchTab(n) {
+  currentTab = n;
+  for (var i = 1; i <= 5; i++)
+    document.getElementById('memtab-'+i).className = (i === n ? 'tab_ov' : 'tab_');
+  document.getElementById('guide-sub').textContent    = tabLabels[n] + ' 등록/관리';
+  document.getElementById('reg-btn-label').textContent = regLabels[n];
+  document.getElementById('search').style.display     = (n <= 3) ? '' : 'none';
+  loadData();
+}
+
+// ── 데이터 로드 ───────────────────────────────────────────────────────────────
+function loadData() {
+  var tbody = document.getElementById('table-body');
+  tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:#888;">로딩 중...</td></tr>';
+
+  if (currentTab <= 3) {
+    fetch('/api/members?type=' + currentTab)
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (j.ok) {
+          currentRows = j.rows;
+          rowMap = {};
+          j.rows.forEach(function(r){ rowMap[r.idx] = r; });
+          renderMembers(j.rows);
+        } else {
+          tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:red;">API 오류: ' + esc(j.error) + '</td></tr>';
+        }
+      })
+      .catch(function(){
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:red;">서버 연결 실패. 서버가 실행 중인지 확인하세요.</td></tr>';
+      });
+  } else if (currentTab === 4) {
+    fetch('/api/members/big-cart')
+      .then(function(r){ return r.json(); })
+      .then(function(j){ if(j.ok){ bigCartData = j.rows; renderBigCart(j.rows); }});
+  } else {
+    fetch('/api/members/jung-cart')
+      .then(function(r){ return r.json(); })
+      .then(function(j){ if(j.ok) renderJungCart(j.rows); });
+  }
+}
+
+// ── 렌더링 ────────────────────────────────────────────────────────────────────
+function editDelBtns(idx) {
+  return '<span class="link_btn_bg_s"><a href="#" onclick="openEditModal('+idx+'); return false;">수정</a></span> ' +
+         '<span class="link_btn_bg_s"><a href="#" onclick="deleteMember('+idx+'); return false;">삭제</a></span>';
+}
+
+function renderMembers(rows) {
+  var thead = document.getElementById('table-head');
+  var tbody = document.getElementById('table-body');
+
+  if (!rows.length) {
+    thead.innerHTML = '';
+    tbody.innerHTML = '<tr><td style="text-align:center;padding:20px;color:#888;">등록된 계정이 없습니다.</td></tr>';
+    return;
+  }
+
+  if (currentTab === 1) {
+    thead.innerHTML =
+      '<tr><th width="22%">관리자명</th><th width="22%">아이디</th><th width="36%">비고</th><th width="20%">수정/삭제</th></tr>';
+    tbody.innerHTML = rows.map(function(r){
+      return '<tr>' +
+        '<td>' + esc(r.mem_name) + '</td>' +
+        '<td>' + esc(r.mem_id)   + '</td>' +
+        '<td>' + esc(r.etc_value || '-') + '</td>' +
+        '<td>' + editDelBtns(r.idx) + '</td>' +
+        '</tr>';
+    }).join('');
+  } else {
+    var label = currentTab === 2 ? '관리자명' : '조치자명';
+    thead.innerHTML =
+      '<tr><th>' + label + '</th><th>아이디</th><th>전화번호</th><th>지역</th><th>구/군</th><th>비고</th><th>수정/삭제</th></tr>';
+    tbody.innerHTML = rows.map(function(r){
+      return '<tr>' +
+        '<td>' + esc(r.mem_name)       + '</td>' +
+        '<td>' + esc(r.mem_id)         + '</td>' +
+        '<td>' + esc(r.mem_tel || '-') + '</td>' +
+        '<td>' + getBigName(r.c1)      + '</td>' +
+        '<td>' + getJungName(r.c2)     + '</td>' +
+        '<td>' + esc(r.etc_value || '-') + '</td>' +
+        '<td>' + editDelBtns(r.idx) + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+}
+
+function renderBigCart(rows) {
+  var thead = document.getElementById('table-head');
+  var tbody = document.getElementById('table-body');
+  thead.innerHTML = '<tr><th width="10%">번호</th><th width="60%">지역명</th><th width="30%">수정 / 삭제</th></tr>';
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px;color:#888;">등록된 지역이 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function(r){
+    return '<tr>' +
+      '<td>' + r.big_num + '</td>' +
+      '<td>' + esc(r.big_name) + '</td>' +
+      '<td>' +
+        '<span class="link_btn_bg_s"><a href="#" onclick="openBigCartEdit('+r.big_num+',\''+esc(r.big_name)+'\'); return false;">수정</a></span> ' +
+        '<span class="link_btn_bg_s"><a href="#" onclick="deleteBigCart('+r.big_num+'); return false;">삭제</a></span>' +
+      '</td></tr>';
+  }).join('');
+}
+
+function renderJungCart(rows) {
+  var thead = document.getElementById('table-head');
+  var tbody = document.getElementById('table-body');
+  thead.innerHTML = '<tr><th width="8%">번호</th><th width="35%">명칭</th><th width="25%">상위지역</th><th width="32%">수정 / 삭제</th></tr>';
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#888;">등록된 구/군이 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(function(r){
+    return '<tr>' +
+      '<td>' + r.jung_num + '</td>' +
+      '<td>' + esc(r.jung_name) + '</td>' +
+      '<td>' + getBigName(r.jung_big_cate) + '</td>' +
+      '<td>' +
+        '<span class="link_btn_bg_s"><a href="#" onclick="openJungCartEdit('+r.jung_num+',\''+esc(r.jung_name)+'\','+r.jung_big_cate+'); return false;">수정</a></span> ' +
+        '<span class="link_btn_bg_s"><a href="#" onclick="deleteJungCart('+r.jung_num+'); return false;">삭제</a></span>' +
+      '</td></tr>';
+  }).join('');
+}
+
+// ── 모달 ──────────────────────────────────────────────────────────────────────
+function openRegModal() {
+  editIdx = null;
+  document.getElementById('modal-title').textContent = regLabels[currentTab];
+  buildModalFields(null);
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function openEditModal(idx) {
+  editIdx = idx;
+  var row = rowMap[idx];
+  if (!row) return;
+  document.getElementById('modal-title').textContent = '수정';
+  buildModalFields(row);
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function openBigCartEdit(num, name) {
+  editIdx = num;
+  document.getElementById('modal-title').textContent = '지역 수정';
+  document.getElementById('modal-fields').innerHTML =
+    '<div class="mrow"><label>지역명</label><input id="f-bname" type="text" value="'+esc(name)+'" /></div>';
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function openJungCartEdit(num, name, bigCate) {
+  editIdx = num;
+  document.getElementById('modal-title').textContent = '구/군 수정';
+  var html = '<div class="mrow"><label>상위지역</label><select id="f-jbig">' +
+    '<option value="0">-- 선택 --</option>' +
+    bigCartData.map(function(b){
+      return '<option value="'+b.big_num+'"'+(b.big_num==bigCate?' selected':'')+'>'+esc(b.big_name)+'</option>';
+    }).join('') + '</select></div>';
+  html += '<div class="mrow"><label>구/군명</label><input id="f-jname" type="text" value="'+esc(name)+'" /></div>';
+  document.getElementById('modal-fields').innerHTML = html;
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function buildModalFields(row) {
+  var r = row || {};
+  var html = '';
+
+  if (currentTab <= 3) {
+    html += '<div class="mrow"><label>아이디</label><input id="f-mid" type="text" value="' + esc(r.mem_id||'') + '"' +
+            (row ? ' readonly' : '') + ' /></div>';
+    html += '<div class="mrow"><label>비밀번호</label><input id="f-mpw" type="password" placeholder="' +
+            (row ? '변경 시에만 입력' : '필수') + '" /></div>';
+    html += '<div class="mrow"><label>이름</label><input id="f-mnm" type="text" value="' + esc(r.mem_name||'') + '" /></div>';
+
+    if (currentTab >= 2) {
+      html += '<div class="mrow"><label>전화번호</label><input id="f-mtel" type="text" value="' + esc(r.mem_tel||'') + '" /></div>';
+
+      var bigOpts = '<option value="0">-- 선택 --</option>' +
+        bigCartData.map(function(b){
+          return '<option value="'+b.big_num+'"'+(r.c1==b.big_num?' selected':'')+'>'+esc(b.big_name)+'</option>';
+        }).join('');
+      html += '<div class="mrow"><label>지역</label><select id="f-c1" onchange="onC1Change()">' + bigOpts + '</select></div>';
+
+      var filteredJung = r.c1
+        ? jungCartData.filter(function(j){ return j.jung_big_cate == r.c1; })
+        : [];
+      var jungOpts = '<option value="0">-- 선택 --</option>' +
+        filteredJung.map(function(j){
+          return '<option value="'+j.jung_num+'"'+(r.c2==j.jung_num?' selected':'')+'>'+esc(j.jung_name)+'</option>';
+        }).join('');
+      html += '<div class="mrow"><label>구/군</label><select id="f-c2">' + jungOpts + '</select></div>';
+    }
+
+    html += '<div class="mrow"><label>비고</label><input id="f-etc" type="text" value="' + esc(r.etc_value||'') + '" /></div>';
+
+  } else if (currentTab === 4) {
+    html += '<div class="mrow"><label>지역명</label><input id="f-bname" type="text" value="" /></div>';
+
+  } else {
+    var bigOpts2 = '<option value="0">-- 선택 --</option>' +
+      bigCartData.map(function(b){
+        return '<option value="'+b.big_num+'">'+esc(b.big_name)+'</option>';
+      }).join('');
+    html += '<div class="mrow"><label>상위지역</label><select id="f-jbig">' + bigOpts2 + '</select></div>';
+    html += '<div class="mrow"><label>구/군명</label><input id="f-jname" type="text" value="" /></div>';
+  }
+
+  document.getElementById('modal-fields').innerHTML = html;
+}
+
+function onC1Change() {
+  var c1 = parseInt(gv('f-c1')) || 0;
+  var sel = document.getElementById('f-c2');
+  if (!sel) return;
+  sel.innerHTML = '<option value="0">-- 선택 --</option>' +
+    jungCartData.filter(function(j){ return j.jung_big_cate == c1; }).map(function(j){
+      return '<option value="'+j.jung_num+'">'+esc(j.jung_name)+'</option>';
+    }).join('');
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+  editIdx = null;
+}
+
+function saveModal() {
+  var title = document.getElementById('modal-title').textContent;
+
+  // 지역 수정 모달
+  if (title === '지역 수정') {
+    var nm = gv('f-bname');
+    if (!nm) { alert('지역명을 입력하세요.'); return; }
+    fetch('/api/members/big-cart/' + editIdx, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({big_name: nm})
+    }).then(function(r){return r.json();}).then(function(j){
+      if(j.ok){ closeModal(); loadData(); } else alert('저장 실패: '+(j.error||''));
+    });
+    return;
+  }
+
+  // 구/군 수정 모달
+  if (title === '구/군 수정') {
+    var big = parseInt(gv('f-jbig')) || 0;
+    var jnm = gv('f-jname');
+    if (!big || !jnm) { alert('상위지역과 명칭을 입력하세요.'); return; }
+    fetch('/api/members/jung-cart/' + editIdx, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({jung_name: jnm, jung_big_cate: big})
+    }).then(function(r){return r.json();}).then(function(j){
+      if(j.ok){ closeModal(); loadData(); } else alert('저장 실패: '+(j.error||''));
+    });
+    return;
+  }
+
+  // MEMBER 탭 1-3
+  if (currentTab <= 3) {
+    var mid = gv('f-mid'), mpw = gv('f-mpw'), mnm = gv('f-mnm');
+    if (!mid) { alert('아이디를 입력하세요.'); return; }
+    if (!editIdx && !mpw) { alert('비밀번호를 입력하세요.'); return; }
+    if (!mnm) { alert('이름을 입력하세요.'); return; }
+    var data = {
+      mem_id:    mid,
+      mem_name:  mnm,
+      mem_type:  currentTab,
+      mem_tel:   gv('f-mtel'),
+      c1:        parseInt(gv('f-c1'))  || 0,
+      c2:        parseInt(gv('f-c2'))  || 0,
+      etc_value: gv('f-etc')
+    };
+    if (mpw) data.mem_pwd = mpw;
+    fetch(editIdx ? '/api/members/' + editIdx : '/api/members', {
+      method: editIdx ? 'PUT' : 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    }).then(function(r){return r.json();}).then(function(j){
+      if(j.ok){ closeModal(); loadData(); } else alert('저장 실패: '+(j.error||''));
+    });
+
+  // 지역 카테고리 신규 등록
+  } else if (currentTab === 4) {
+    var nm2 = gv('f-bname');
+    if (!nm2) { alert('지역명을 입력하세요.'); return; }
+    fetch('/api/members/big-cart', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({big_name: nm2})
+    }).then(function(r){return r.json();}).then(function(j){
+      if(j.ok){ closeModal(); loadData(); } else alert('저장 실패: '+(j.error||''));
+    });
+
+  // 구/군 카테고리 신규 등록
+  } else {
+    var big2 = parseInt(gv('f-jbig')) || 0;
+    var jnm2 = gv('f-jname');
+    if (!big2 || !jnm2) { alert('상위지역과 명칭을 입력하세요.'); return; }
+    fetch('/api/members/jung-cart', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({jung_name: jnm2, jung_big_cate: big2})
+    }).then(function(r){return r.json();}).then(function(j){
+      if(j.ok){ closeModal(); loadData(); } else alert('저장 실패: '+(j.error||''));
+    });
+  }
+}
+
+// ── 삭제 ──────────────────────────────────────────────────────────────────────
+function deleteMember(idx) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  fetch('/api/members/' + idx, {method:'DELETE'})
+    .then(function(r){return r.json();})
+    .then(function(j){ if(j.ok) loadData(); else alert('삭제 실패: '+(j.error||'')); });
+}
+
+function deleteBigCart(num) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  fetch('/api/members/big-cart/' + num, {method:'DELETE'})
+    .then(function(r){return r.json();})
+    .then(function(j){ if(j.ok) loadData(); else alert('삭제 실패: '+(j.error||'')); });
+}
+
+function deleteJungCart(num) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  fetch('/api/members/jung-cart/' + num, {method:'DELETE'})
+    .then(function(r){return r.json();})
+    .then(function(j){ if(j.ok) loadData(); else alert('삭제 실패: '+(j.error||'')); });
+}
+
+// ── 검색 ──────────────────────────────────────────────────────────────────────
+function doSearch() {
+  var sw    = document.getElementById('sw').value;
+  var sword = document.getElementById('sword').value.toLowerCase().trim();
+  if (!sword) { renderMembers(currentRows); return; }
+  var filtered = currentRows.filter(function(r){
+    var v = (sw === 'mem_id' ? r.mem_id : r.mem_name) || '';
+    return v.toLowerCase().indexOf(sword) >= 0;
+  });
+  renderMembers(filtered);
+}
 </script>
 
 </body>
