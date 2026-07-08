@@ -18,6 +18,8 @@
 .rmt-inp:focus{outline:2px solid #4b637f;outline-offset:0;border-color:#4b637f;}
 .rmt-ro{padding:3px 6px;border:1px solid #b4b4b4;background:#dcdcdc;font-size:13px;color:#555;box-sizing:border-box;}
 .rmt-lbl{font-size:11px;color:#555;display:block;margin-bottom:2px;}
+.rmt-tab-act{background:#fff;border-bottom:2px solid #fff;margin-bottom:-2px;color:#4b637f;font-weight:600;cursor:pointer;}
+.rmt-tab-inact{background:#e0e4eb;color:#888;cursor:pointer;}
 @media(max-width:680px){.rmt-ip-row{flex-wrap:wrap !important;gap:4px !important;}.rmt-form-table td{display:block !important;width:100% !important;padding-left:0 !important;}}
 </style>
 </head>
@@ -82,10 +84,10 @@
         <div style="width:100%; border:1px solid #dfe3e8; border-radius:2px; overflow:hidden;">
           <div style="background:#4b637f; color:#fff; font-size:14px; font-weight:600; padding:9px 14px;">멀티벨 단말 원격설정</div>
           <div style="display:flex; background:#e0e4eb; border-bottom:2px solid #4b637f;">
-            <div style="padding:7px 18px; font-size:13px; font-weight:600; background:#fff; border-bottom:2px solid #fff; margin-bottom:-2px; cursor:default; color:#4b637f;">일반설정</div>
-            <div style="padding:7px 18px; font-size:13px; color:#888; cursor:default;">이지사운드</div>
+            <div id="tabGen" class="rmt-tab-act" style="padding:7px 18px; font-size:13px;" onclick="rmtTab('gen')">일반설정</div>
+            <div id="tabEs" class="rmt-tab-inact" style="padding:7px 18px; font-size:13px;" onclick="rmtTab('es')">이지사운드</div>
           </div>
-          <div style="background:#fff; padding:14px 18px;">
+          <div id="tabContentGen" style="background:#fff; padding:14px 18px;">
             <table class="rmt-form-table" style="border-collapse:collapse; font-size:13px; color:#333;">
               <tr>
                 <td style="padding:4px 8px 8px 0; white-space:nowrap; width:110px; font-weight:600; color:#4b637f;">대상 단말</td>
@@ -195,6 +197,30 @@
             </div>
             <div style="margin-top:14px;">
               <button id="rmtSaveBtn" onclick="rmtSave();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">저장</button>
+            </div>
+          </div>
+          <div id="tabContentEs" style="display:none; background:#fff; padding:14px 18px;">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button id="esTrigVolWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">트리거볼륨쓰기</button>
+                <input id="esTrigVol" type="text" value="5000" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                <button id="esTrigVolSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button id="esAccWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">정확도쓰기</button>
+                <input id="esAcc" type="text" value="40" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                <button id="esAccSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button id="esMicVolWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">마이크볼륨쓰기</button>
+                <input id="esMicVol" type="text" value="0" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                <button id="esMicVolSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button id="esTrigSensWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">트리거감도쓰기</button>
+                <input id="esTrigSens" type="text" value="40" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                <button id="esTrigSensSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
+              </div>
             </div>
           </div>
         </div>
@@ -347,6 +373,18 @@
 
     g('mqtt-topic').value = topic;
     g('mqtt-payload').value = JSON.stringify(payload);
+  }
+
+  function rmtTab(name) {
+    var isGen = name === 'gen';
+    var tGen = document.getElementById('tabGen');
+    var tEs = document.getElementById('tabEs');
+    var cGen = document.getElementById('tabContentGen');
+    var cEs = document.getElementById('tabContentEs');
+    tGen.className = isGen ? 'rmt-tab-act' : 'rmt-tab-inact';
+    tEs.className = isGen ? 'rmt-tab-inact' : 'rmt-tab-act';
+    cGen.style.display = isGen ? 'block' : 'none';
+    cEs.style.display = isGen ? 'none' : 'block';
   }
 </script>
 
