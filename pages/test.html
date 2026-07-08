@@ -186,12 +186,12 @@
             </table>
             <div style="margin-top:12px; padding-top:10px; border-top:1px solid #dfe3e8; display:flex; flex-direction:column; gap:8px;">
               <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:13px; color:#333;">
-                <span class="rmt-tgl" onclick="rmtTgl(this,'tglTel12')"><span class="rmt-tgl-knob"></span></span>
+                <span class="rmt-tgl" onclick="rmtTgl(this,'tglTel12'); event.stopPropagation();"><span class="rmt-tgl-knob"></span></span>
                 <input type="checkbox" id="tglTel12" style="display:none;">
                 TEL1/TEL2 구분(벨 홀짝)
               </label>
               <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:13px; color:#333;">
-                <span class="rmt-tgl" onclick="rmtTgl(this,'tglSmsBell')"><span class="rmt-tgl-knob"></span></span>
+                <span class="rmt-tgl" onclick="rmtTgl(this,'tglSmsBell'); event.stopPropagation();"><span class="rmt-tgl-knob"></span></span>
                 <input type="checkbox" id="tglSmsBell" style="display:none;">
                 SMS 벨번호 추가
               </label>
