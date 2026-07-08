@@ -215,7 +215,7 @@
         + '<td>' + (r.region     != null ? r.region     : '-') + '</td>'
         + '<td>' + (r.address    != null ? r.address    : '-') + '</td>'
         + '<td>' + formatPhone(r.phone_no) + '</td>'
-        + '<td>' + stateCell + '</td>'
+        + '<td class="diag-state-cell" data-phone="' + r.phone_no + '" style="cursor:help;">' + stateCell + '</td>'
         + '<td>' + lastSeenCell + '</td>'
         + '<td></td>'
         + '</tr>';
@@ -282,6 +282,117 @@
 
   loadData();
   setInterval(loadData, 30000);
+
+  var tipCache = {};
+  var tipEl = null;
+  var tipCurrentPhone = null;
+
+  function getTip() {
+    if (!tipEl) {
+      tipEl = document.createElement('div');
+      tipEl.style.cssText = 'position:fixed;background:#222;color:#fff;font-size:12px;line-height:1.7;padding:8px 12px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:99999;pointer-events:none;display:none;max-width:360px;white-space:nowrap;';
+      document.body.appendChild(tipEl);
+    }
+    return tipEl;
+  }
+
+  function hideTip() {
+    getTip().style.display = 'none';
+    tipCurrentPhone = null;
+  }
+
+  function positionTip(cx, cy) {
+    var tip = getTip();
+    tip.style.left = (cx + 16) + 'px';
+    tip.style.top  = (cy + 16) + 'px';
+    var r = tip.getBoundingClientRect();
+    if (r.right  > window.innerWidth)  tip.style.left = (cx - r.width  - 4) + 'px';
+    if (r.bottom > window.innerHeight) tip.style.top  = (cy - r.height - 4) + 'px';
+  }
+
+  function formatKSTTip(isoStr) {
+    if (!isoStr) return '-';
+    var d = new Date(isoStr);
+    var kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    var y  = kst.getUTCFullYear();
+    var mo = String(kst.getUTCMonth() + 1).padStart(2, '0');
+    var dy = String(kst.getUTCDate()).padStart(2, '0');
+    var h  = String(kst.getUTCHours()).padStart(2, '0');
+    var mi = String(kst.getUTCMinutes()).padStart(2, '0');
+    var sec= String(kst.getUTCSeconds()).padStart(2, '0');
+    return y + '-' + mo + '-' + dy + ' ' + h + ':' + mi + ':' + sec;
+  }
+
+  function buildTipHtml(data) {
+    if (!data) return '수신 데이터 없음';
+    var bellText = data.bellnumber + (data.bellnumber !== 0 ? ' (경보!)' : ' (평상시)');
+    var bellLine = data.is_alarm
+      ? '<span style="color:#ff8888;">경보번호(bellnumber): ' + bellText + '</span>'
+      : '경보번호(bellnumber): ' + bellText;
+    return '수신시각: '             + formatKSTTip(data.received_at)
+      + '<br>전화번호: '            + data.phone_no
+      + '<br>'                      + bellLine
+      + '<br>시퀀스: '              + data.seqnum
+      + '<br>전압: '                + data.voltage
+      + '<br>벨상태(bellstatus): '  + data.bellstatus
+      + '<br>장비번호(machinenum): ' + data.machinenum
+      + '<br>펌웨어: '              + data.fw_version
+      + '<br>체크섬: '              + data.chksum + ' (' + (data.checksum_ok ? '✓ 정상' : '✗ 오류') + ')'
+      + '<br>RAW: <span style="font-family:monospace;font-size:11px;">' + data.raw_msg + '</span>';
+  }
+
+  function findStateCell(el) {
+    while (el && el.tagName) {
+      if (el.tagName === 'TD' && el.getAttribute('data-phone')) return el;
+      if (el.tagName === 'TR' || el.tagName === 'TABLE') return null;
+      el = el.parentNode;
+    }
+    return null;
+  }
+
+  document.addEventListener('mouseover', function(e) {
+    var cell = findStateCell(e.target);
+    if (!cell) { hideTip(); return; }
+    var phone = cell.getAttribute('data-phone');
+    if (phone === tipCurrentPhone) return;
+    tipCurrentPhone = phone;
+    var tip = getTip();
+    tip.innerHTML = '불러오는 중...';
+    tip.style.display = 'block';
+    positionTip(e.clientX, e.clientY);
+    if (tipCache[phone] !== undefined) {
+      tip.innerHTML = buildTipHtml(tipCache[phone]);
+      positionTip(e.clientX, e.clientY);
+      return;
+    }
+    fetch('/api/bells/' + phone + '/last-packet')
+      .then(function(r) { return r.json(); })
+      .then(function(j) {
+        tipCache[phone] = j.ok ? j.data : null;
+        if (tipCurrentPhone === phone) getTip().innerHTML = buildTipHtml(tipCache[phone]);
+      })
+      .catch(function() {
+        tipCache[phone] = null;
+        if (tipCurrentPhone === phone) getTip().innerHTML = '패킷 조회 오류';
+      });
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    var tip = getTip();
+    if (tip.style.display === 'none') return;
+    positionTip(e.clientX, e.clientY);
+  });
+
+  document.addEventListener('mouseout', function(e) {
+    var cell = findStateCell(e.target);
+    if (!cell) return;
+    var t = e.relatedTarget;
+    while (t) {
+      if (t === cell) return;
+      t = t.parentNode;
+    }
+    hideTip();
+  });
 </script>
 
 </body>
