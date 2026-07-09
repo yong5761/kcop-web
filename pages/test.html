@@ -506,9 +506,9 @@
         }
         var el = document.getElementById('topbar-username');
         if (el && j.user.mem_name) el.textContent = j.user.mem_name;
-        if (j.user.mem_type === 1) {
+        if (Number(j.user.mem_type) === 1) {
           document.querySelectorAll('.admin-only').forEach(function(e) {
-            e.style.removeProperty('display');
+            e.classList.remove('admin-only');
           });
         }
       }
