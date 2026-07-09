@@ -2,6 +2,7 @@
 
 const { Router } = require('express');
 const mqtt = require('mqtt');
+const ingest = require('../mqtt/ingest');
 
 const router = Router();
 
@@ -27,6 +28,18 @@ router.post('/api/mqtt/publish', (req, res) => {
     }
     res.json({ ok: true, topic, payload, published_at: new Date().toISOString() });
   });
+});
+
+router.get('/api/mqtt/connection-status', (req, res) => {
+  const devNo = String(req.query.devNo || '').trim();
+  if (!devNo) {
+    return res.status(400).json({ ok: false, error: 'devNo 파라미터 필요' });
+  }
+  const at = ingest.getConnAt(devNo);
+  if (at && (Date.now() - at) <= 30000) {
+    return res.json({ ok: true, connected: true, at: new Date(at).toISOString() });
+  }
+  return res.json({ ok: true, connected: false });
 });
 
 module.exports = router;

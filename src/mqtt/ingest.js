@@ -4,21 +4,36 @@ const mqtt = require('mqtt');
 const pool = require('../db');
 const { parseBellData, topicToPhone } = require('./parseBellData');
 
+const connMap = new Map();
+
 function startIngest() {
   const client = mqtt.connect(process.env.MQTT_URL);
 
   client.on('connect', () => {
     console.log('[MQTT] connected:', process.env.MQTT_URL);
-    client.subscribe('hk-multii/+/log', (err) => {
+    client.subscribe(['hk-multii/+/log', 'hk-multii/+/in'], (err) => {
       if (err) {
         console.error('[MQTT] subscribe error:', err.message);
       } else {
-        console.log('[MQTT] subscribed to hk-multii/+/log');
+        console.log('[MQTT] subscribed to hk-multii/+/log, hk-multii/+/in');
       }
     });
   });
 
   client.on('message', async (topic, message) => {
+    // /in 응답: connMap에 수신시각 저장 후 즉시 반환
+    if (topic.endsWith('/in')) {
+      let data;
+      try { data = JSON.parse(message.toString()); } catch (e) { /* 무시 */ }
+      const match = topic.match(/\/MB_(\w+)\/in$/);
+      const pnum = (data && data.pnum) ? String(data.pnum) : (match ? match[1] : '');
+      if (pnum) {
+        connMap.set(pnum, Date.now());
+        console.log('[MQTT] /in 연결응답: pnum=%s', pnum);
+      }
+      return;
+    }
+
     let payload;
     try {
       payload = JSON.parse(message.toString());
@@ -141,3 +156,4 @@ function startIngest() {
 }
 
 module.exports = startIngest;
+module.exports.getConnAt = (pnum) => connMap.get(String(pnum));
