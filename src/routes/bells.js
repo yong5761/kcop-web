@@ -5,8 +5,27 @@ const pool = require('../db');
 
 const router = Router();
 
+function regionFilter(user, alias) {
+  if (!user) return { clause: '', params: [] };
+  if (user.mem_type === 1) return { clause: '', params: [] };
+  const conds = [];
+  const params = [];
+  function add(c1, c2) {
+    if (c1 && c2 && Number(c1) > 0 && Number(c2) > 0) {
+      conds.push(`(${alias}.c1 = ? AND ${alias}.c2 = ?)`);
+      params.push(c1, c2);
+    }
+  }
+  add(user.c1,   user.c2);
+  add(user.c1_2, user.c2_2);
+  add(user.c1_3, user.c2_3);
+  if (conds.length === 0) return { clause: 'AND 1=0', params: [] };
+  return { clause: 'AND (' + conds.join(' OR ') + ')', params };
+}
+
 router.get('/api/bells', async (req, res) => {
   try {
+    const { clause, params } = regionFilter(req.session.user, 'b');
     const [rows] = await pool.execute(
       `SELECT
          b.phone_no, b.bell_name, b.region, b.address, b.lat, b.lng, b.machine_no,
@@ -18,7 +37,9 @@ router.get('/api/bells', async (req, res) => {
          END AS comm_state
        FROM bells b
        LEFT JOIN bell_latest bl ON b.phone_no = bl.phone_no
-       ORDER BY b.phone_no ASC`
+       WHERE 1=1 ${clause}
+       ORDER BY b.phone_no ASC`,
+      params
     );
     res.json({ ok: true, rows });
   } catch (e) {
