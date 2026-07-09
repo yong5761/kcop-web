@@ -12,7 +12,8 @@ router.get('/api/members', async (req, res) => {
   try {
     const [rows] = await pool.execute(
       `SELECT idx, mem_id, mem_name, mem_tel, mem_tel2, mem_tel3,
-              c1, c2, c3, etc_value, is_sms, mem_type, regidate, loginDate, loginCnt
+              c1, c2, c3, etc_value, is_sms, mem_type, regidate, loginDate, loginCnt,
+              gateway_no
        FROM MEMBER WHERE mem_type = ? ORDER BY idx DESC`,
       [type]
     );
@@ -25,15 +26,16 @@ router.get('/api/members', async (req, res) => {
 
 router.post('/api/members', async (req, res) => {
   const { mem_id, mem_name, mem_pwd, mem_tel, mem_tel2, mem_tel3,
-          mem_type, c1, c2, c3, etc_value, is_sms } = req.body;
+          mem_type, c1, c2, c3, etc_value, is_sms, gateway_no } = req.body;
   try {
     const [result] = await pool.execute(
       `INSERT INTO MEMBER
          (mem_id, mem_name, mem_pwd, mem_tel, mem_tel2, mem_tel3,
-          mem_type, c1, c2, c3, etc_value, is_sms, regidate)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,NOW())`,
+          mem_type, c1, c2, c3, etc_value, is_sms, gateway_no, regidate)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW())`,
       [mem_id, mem_name, mem_pwd || '', mem_tel || '', mem_tel2 || '', mem_tel3 || '',
-       mem_type || 1, c1 || 0, c2 || 0, c3 || 0, etc_value || '', is_sms || 'N']
+       mem_type || 1, c1 || 0, c2 || 0, c3 || 0, etc_value || '', is_sms || 'N',
+       gateway_no || null]
     );
     res.json({ ok: true, insertId: result.insertId });
   } catch (e) {
@@ -44,21 +46,23 @@ router.post('/api/members', async (req, res) => {
 
 router.put('/api/members/:idx', async (req, res) => {
   const { mem_name, mem_pwd, mem_tel, mem_tel2, mem_tel3,
-          c1, c2, c3, etc_value, is_sms } = req.body;
+          c1, c2, c3, etc_value, is_sms, gateway_no } = req.body;
+  const gwSet = gateway_no !== undefined ? ', gateway_no=?' : '';
+  const gwVal = gateway_no !== undefined ? [gateway_no || null] : [];
   try {
     if (mem_pwd) {
       await pool.execute(
         `UPDATE MEMBER SET mem_name=?, mem_pwd=?, mem_tel=?, mem_tel2=?, mem_tel3=?,
-                           c1=?, c2=?, c3=?, etc_value=?, is_sms=? WHERE idx=?`,
+                           c1=?, c2=?, c3=?, etc_value=?, is_sms=?${gwSet} WHERE idx=?`,
         [mem_name, mem_pwd, mem_tel || '', mem_tel2 || '', mem_tel3 || '',
-         c1 || 0, c2 || 0, c3 || 0, etc_value || '', is_sms || 'N', req.params.idx]
+         c1 || 0, c2 || 0, c3 || 0, etc_value || '', is_sms || 'N', ...gwVal, req.params.idx]
       );
     } else {
       await pool.execute(
         `UPDATE MEMBER SET mem_name=?, mem_tel=?, mem_tel2=?, mem_tel3=?,
-                           c1=?, c2=?, c3=?, etc_value=?, is_sms=? WHERE idx=?`,
+                           c1=?, c2=?, c3=?, etc_value=?, is_sms=?${gwSet} WHERE idx=?`,
         [mem_name, mem_tel || '', mem_tel2 || '', mem_tel3 || '',
-         c1 || 0, c2 || 0, c3 || 0, etc_value || '', is_sms || 'N', req.params.idx]
+         c1 || 0, c2 || 0, c3 || 0, etc_value || '', is_sms || 'N', ...gwVal, req.params.idx]
       );
     }
     res.json({ ok: true });
