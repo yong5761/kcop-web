@@ -399,9 +399,9 @@
     var numOr0 = function(v) { var n = Number(v); return isNaN(n) ? 0 : n; };
 
     var devNo = s('devNo').trim();
-    var topic = 'multibell/sm_' + devNo;
+    var topic = 'hk-multii/MB_' + devNo + '/out';
     var payload = {
-      op: 101,
+      op: 2,
       m: euckrHex(s('sms')),
       t1: s('tel1'), t2: s('tel2'), t3: s('tel3'), t4: s('tel4'), t5: s('tel5'),
       machineIdx: 'HK',
