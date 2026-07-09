@@ -109,12 +109,25 @@ router.post('/api/logout', (req, res) => {
   });
 });
 
-// GET /api/me — 현재 세션 사용자 반환
-router.get('/api/me', (req, res) => {
+// GET /api/me — 세션 기반 + gateway_no/mem_name DB 최신값으로 덮어쓰기
+router.get('/api/me', async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });
   }
-  return res.json({ ok: true, user: req.session.user });
+  const fresh = { ...req.session.user };
+  try {
+    const [rows] = await pool.execute(
+      'SELECT gateway_no, mem_name FROM MEMBER WHERE idx = ?',
+      [req.session.user.idx]
+    );
+    if (rows.length) {
+      fresh.gateway_no = rows[0].gateway_no || null;
+      fresh.mem_name   = rows[0].mem_name;
+    }
+  } catch (e) {
+    console.error('[/api/me] DB 조회 실패, 세션값 반환:', e.message);
+  }
+  return res.json({ ok: true, user: fresh });
 });
 
 module.exports = router;
