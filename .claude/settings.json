@@ -73,7 +73,9 @@
       "PowerShell(python \"C:\\\\Users\\\\USER\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-USER-Desktop-KcopWeb\\\\328ca797-80a0-4edc-93ed-ee1129bf78a5\\\\scratchpad\\\\create_db_user.py\")",
       "Bash(ssh -p 2540 -o StrictHostKeyChecking=no root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop && pm2 logs kcop --lines 10 --nostream\")",
       "Bash(ssh -p 1022 -o StrictHostKeyChecking=no root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop && pm2 logs kcop --lines 10 --nostream\")",
-      "Bash(ssh -p 22 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop && pm2 logs kcop --lines 10 --nostream\")"
+      "Bash(ssh -p 22 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop && pm2 logs kcop --lines 10 --nostream\")",
+      "Bash(ssh -p 2540 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@211.115.76.21 \"mysql -u dbeaver -pDbeaver2024! kcop -e \\\\\"SHOW TABLES;\\\\\"\")",
+      "Bash(python3 -c ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\USER\\Desktop\\KcopWeb\\common",
