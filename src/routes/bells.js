@@ -29,6 +29,7 @@ router.get('/api/bells', async (req, res) => {
     const [rows] = await pool.execute(
       `SELECT
          b.phone_no, b.bell_name, b.region, b.address, b.lat, b.lng, b.machine_no,
+         b.c1, b.c2, b.charge, b.bell_type, b.etc,
          bl.last_seq, bl.voltage, bl.bellstatus, bl.fw_version, bl.last_seen,
          CASE
            WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 150 MINUTE)
