@@ -15,34 +15,11 @@
       background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto;
     }
     #edit-modal-box {
-      background: #fff; width: 460px; margin: 40px auto; padding: 24px 28px;
-      border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      background: #fff; max-width: 620px; width: 90%;
+      margin: 50px auto; border-radius: 4px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
     }
-    #edit-modal-box h3 {
-      margin: 0 0 16px; font-size: 16px; border-bottom: 2px solid #111; padding-bottom: 8px;
-    }
-    #edit-modal-box .field-row {
-      width: 100%; float: left; margin-bottom: 8px; font-size: 13px;
-    }
-    #edit-modal-box .field-row label {
-      display: inline-block; width: 90px; color: #555; vertical-align: top; padding-top: 5px;
-    }
-    #edit-modal-box .field-row input,
-    #edit-modal-box .field-row select,
-    #edit-modal-box .field-row textarea {
-      width: 300px; padding: 4px 6px; font-size: 13px; border: 1px solid #ccc; box-sizing: border-box;
-    }
-    #edit-modal-box .field-row textarea { height: 60px; resize: vertical; }
-    #edit-modal-box .field-row select { width: 145px; margin-right: 6px; }
-    #edit-modal-box .btn-row {
-      margin-top: 16px; text-align: right; clear: both;
-    }
-    #edit-modal-box .btn-row a {
-      display: inline-block; padding: 6px 18px; margin-left: 6px;
-      font-size: 13px; border-radius: 3px; text-decoration: none; cursor: pointer;
-    }
-    .btn-save { background: #4b637f; color: #fff; }
-    .btn-cancel { background: #999; color: #fff; }
+    #edit-modal-box .pop_tt_bg { box-sizing: border-box; }
   </style>
   <script src="../common/js/jquery-1.7.1.min.js"></script>
   <script src="../common/js/kcop-auth.js"></script>
@@ -216,56 +193,75 @@
     <!-- 수정 모달 -->
     <div id="edit-modal-overlay" onclick="if(event.target===this)closeEditModal();">
       <div id="edit-modal-box">
-        <h3>장비 수정</h3>
-        <input type="hidden" id="e-orig-phone">
-        <div class="field-row">
-          <label>지역</label>
-          <select id="e-c1" onchange="onEditC1Change()"></select>
-          <select id="e-c2"></select>
-        </div>
-        <div class="field-row">
-          <label>장비번호</label>
-          <input type="text" id="e-machine">
-        </div>
-        <div class="field-row">
-          <label>비상벨명</label>
-          <input type="text" id="e-bellname">
-        </div>
-        <div class="field-row">
-          <label>위도</label>
-          <input type="text" id="e-lat">
-        </div>
-        <div class="field-row">
-          <label>경도</label>
-          <input type="text" id="e-lng">
-        </div>
-        <div class="field-row">
-          <label>지역명</label>
-          <input type="text" id="e-region">
-        </div>
-        <div class="field-row">
-          <label>설치주소</label>
-          <input type="text" id="e-address">
-        </div>
-        <div class="field-row">
-          <label>전화번호</label>
-          <input type="text" id="e-phone">
-        </div>
-        <div class="field-row">
-          <label>담당자정보</label>
-          <input type="text" id="e-charge">
-        </div>
-        <div class="field-row">
-          <label>비상벨구분</label>
-          <input type="text" id="e-belltype">
-        </div>
-        <div class="field-row">
-          <label>기타</label>
-          <textarea id="e-etc"></textarea>
-        </div>
-        <div class="btn-row">
-          <a href="#" class="btn-save" onclick="saveEditBell();return false;">저장</a>
-          <a href="#" class="btn-cancel" onclick="closeEditModal();return false;">취소</a>
+        <p class="pop_tt_bg">장비정보관리</p>
+        <div style="width:95%; padding:10px 0 20px; margin-left:2.5%;">
+          <input type="hidden" id="e-orig-phone">
+          <table class="write">
+            <tr>
+              <th><span>지역</span></th>
+              <td>
+                <select id="e-c1" class="select01" onchange="onEditC1Change()"></select>
+                &nbsp;
+                <select id="e-c2" class="select01"></select>
+              </td>
+            </tr>
+            <tr>
+              <th><span>장비번호</span></th>
+              <td><input type="text" id="e-machine" class="input01" style="width:80%;" maxlength="20"></td>
+            </tr>
+            <tr>
+              <th><span>비상벨명</span></th>
+              <td><input type="text" id="e-bellname" class="input01" style="width:80%;" maxlength="30"></td>
+            </tr>
+            <tr>
+              <th><span>위도</span></th>
+              <td><input type="text" id="e-lat" class="input01" style="width:80%;" maxlength="20"></td>
+            </tr>
+            <tr>
+              <th><span>경도</span></th>
+              <td><input type="text" id="e-lng" class="input01" style="width:80%;" maxlength="20"></td>
+            </tr>
+            <tr>
+              <th><span>지역</span></th>
+              <td><input type="text" id="e-region" class="input01" style="width:80%;" maxlength="30"></td>
+            </tr>
+            <tr>
+              <th><span>설치주소</span></th>
+              <td><input type="text" id="e-address" class="input01" style="width:80%;" maxlength="200"></td>
+            </tr>
+            <tr>
+              <th><span>전화번호</span></th>
+              <td><input type="text" id="e-phone" class="input01" style="width:80%;" maxlength="20"></td>
+            </tr>
+            <tr>
+              <th><span>담당자정보</span></th>
+              <td><input type="text" id="e-charge" class="input01" style="width:80%;" maxlength="30"></td>
+            </tr>
+            <tr>
+              <th><span>비상벨구분</span></th>
+              <td>
+                <select id="e-belltype" class="select01">
+                  <option value="비상벨">비상벨</option>
+                  <option value="영상벨">영상벨</option>
+                  <option value="기타">기타</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <th><span>기타</span></th>
+              <td><textarea id="e-etc" class="textarea01" style="width:80%; height:80px;" maxlength="200"></textarea></td>
+            </tr>
+          </table>
+          <div class="btn_wrap" style="margin-top:20px;">
+            <p>
+              <span class="y_btn_bg" style="display:inline-block; width:80px; text-align:center;">
+                <a href="#" onclick="submitEdit();return false;">수정</a>
+              </span>
+              <span class="y_btn_bg" style="display:inline-block; width:80px; text-align:center; margin-left:8px;">
+                <a href="#" onclick="closeEditModal();return false;">취소</a>
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -322,10 +318,7 @@
     }
 
     function applyFilter(sword) {
-      if (!sword) {
-        filteredRows = allRows.slice();
-        return;
-      }
+      if (!sword) { filteredRows = allRows.slice(); return; }
       var lc = sword.toLowerCase();
       filteredRows = allRows.filter(function(r) {
         var machineStr  = r.machine_no != null ? String(r.machine_no).toLowerCase() : '';
@@ -384,14 +377,14 @@
           + '<td>' + (r.address    != null ? r.address    : '-') + '</td>'
           + '<td>' + formatPhone(r.phone_no) + '</td>'
           + '<td>' + (r.bell_type  != null ? r.bell_type  : '비상벨') + '</td>'
-          + '<td><span class="link_btn_bg_s"><a href="#" onclick="openEditModal(\'' + escJs(String(r.phone_no)) + '\');return false;">수정</a></span> <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>'
+          + '<td><span class="link_btn_bg_s"><a href="#" onclick="openEditModal(\'' + escJs(String(r.phone_no)) + '\');return false;">수정</a></span>'
+          + ' <span class="link_btn_bg_s"><a href="#" onclick="return false;">삭제</a></span></td>'
           + '</tr>';
       }
       if (html === '') {
         html = '<tr><td colspan="11">데이터를 불러오지 못했습니다</td></tr>';
       }
       tbody.innerHTML = html;
-
       renderPaging(totalPages);
     }
 
@@ -427,7 +420,7 @@
     }
 
     function loadData() {
-      var savedPage = currentPage;
+      var savedPage  = currentPage;
       var savedSword = document.getElementById('data-sword') ? document.getElementById('data-sword').value.trim() : '';
 
       fetch('/api/bells')
@@ -460,17 +453,22 @@
       }
       if (!r) { alert('단말 정보를 찾을 수 없습니다.'); return; }
 
-      document.getElementById('e-orig-phone').value = String(r.phone_no);
-      document.getElementById('e-machine').value   = r.machine_no != null ? r.machine_no : '';
-      document.getElementById('e-bellname').value  = r.bell_name  != null ? r.bell_name  : '';
-      document.getElementById('e-lat').value       = r.lat        != null ? r.lat        : '';
-      document.getElementById('e-lng').value       = r.lng        != null ? r.lng        : '';
-      document.getElementById('e-region').value    = r.region     != null ? r.region     : '';
-      document.getElementById('e-address').value   = r.address    != null ? r.address    : '';
-      document.getElementById('e-phone').value     = String(r.phone_no);
-      document.getElementById('e-charge').value    = r.charge     != null ? r.charge     : '';
-      document.getElementById('e-belltype').value  = r.bell_type  != null ? r.bell_type  : '비상벨';
-      document.getElementById('e-etc').value       = r.etc        != null ? r.etc        : '';
+      document.getElementById('e-orig-phone').value  = String(r.phone_no);
+      document.getElementById('e-machine').value     = r.machine_no != null ? r.machine_no : '';
+      document.getElementById('e-bellname').value    = r.bell_name  != null ? r.bell_name  : '';
+      document.getElementById('e-lat').value         = r.lat        != null ? r.lat        : '';
+      document.getElementById('e-lng').value         = r.lng        != null ? r.lng        : '';
+      document.getElementById('e-region').value      = r.region     != null ? r.region     : '';
+      document.getElementById('e-address').value     = r.address    != null ? r.address    : '';
+      document.getElementById('e-phone').value       = String(r.phone_no);
+      document.getElementById('e-charge').value      = r.charge     != null ? r.charge     : '';
+      document.getElementById('e-etc').value         = r.etc        != null ? r.etc        : '';
+
+      // 비상벨구분 선택
+      var selBT = document.getElementById('e-belltype');
+      var btVal = r.bell_type != null ? r.bell_type : '비상벨';
+      selBT.value = btVal;
+      if (selBT.value !== btVal) selBT.value = '비상벨'; // 목록에 없는 값 fallback
 
       buildC1Select(r.c1);
       buildC2Select(r.c1, r.c2);
@@ -494,11 +492,11 @@
     function buildC2Select(c1val, selectedC2) {
       var sel = document.getElementById('e-c2');
       sel.innerHTML = '<option value="">-- 구군 선택 --</option>';
-      var filtered = jungCartData.filter(function(j) {
+      var list = jungCartData.filter(function(j) {
         return String(j.jung_big_cate) === String(c1val);
       });
-      for (var i = 0; i < filtered.length; i++) {
-        var j = filtered[i];
+      for (var i = 0; i < list.length; i++) {
+        var j = list[i];
         var opt = document.createElement('option');
         opt.value = j.jung_num;
         opt.textContent = j.jung_name;
@@ -508,34 +506,51 @@
     }
 
     function onEditC1Change() {
-      var c1val = document.getElementById('e-c1').value;
-      buildC2Select(c1val, '');
+      buildC2Select(document.getElementById('e-c1').value, '');
     }
 
     function closeEditModal() {
       document.getElementById('edit-modal-overlay').style.display = 'none';
     }
 
-    function saveEditBell() {
+    function submitEdit() {
+      var c1val = document.getElementById('e-c1').value;
+      var c2val = document.getElementById('e-c2').value;
+      if (!c1val || !c2val || c1val === '0' || c2val === '0') {
+        alert('지역을 선택해주세요.'); return;
+      }
+
+      var machine  = document.getElementById('e-machine').value.trim();
+      var bellname = document.getElementById('e-bellname').value.trim();
+      var phone    = document.getElementById('e-phone').value.trim();
+      var address  = document.getElementById('e-address').value.trim();
+
+      if (!machine || machine.length > 20)  { alert('장비번호를 확인해주세요(1~20자).'); return; }
+      if (!bellname || bellname.length > 30) { alert('비상벨명을 확인해주세요(1~30자).'); return; }
+      if (!phone || phone.length > 20)      { alert('전화번호를 확인해주세요(1~20자).'); return; }
+      if (address.length > 200)             { alert('설치주소는 200자 이내로 입력해주세요.'); return; }
+
+      if (!confirm('수정 하시겠습니까?')) return;
+
       var origPhone = document.getElementById('e-orig-phone').value;
-      var latVal  = document.getElementById('e-lat').value.trim();
-      var lngVal  = document.getElementById('e-lng').value.trim();
+      var latVal    = document.getElementById('e-lat').value.trim();
+      var lngVal    = document.getElementById('e-lng').value.trim();
       var chargeVal = document.getElementById('e-charge').value.trim();
       var etcVal    = document.getElementById('e-etc').value.trim();
 
       var body = {
-        bell_name:  document.getElementById('e-bellname').value.trim() || null,
-        region:     document.getElementById('e-region').value.trim()   || null,
-        address:    document.getElementById('e-address').value.trim()  || null,
-        lat:        latVal  !== '' ? Number(latVal)  : null,
-        lng:        lngVal  !== '' ? Number(lngVal)  : null,
-        machine_no: document.getElementById('e-machine').value.trim()  || null,
-        c1:         Number(document.getElementById('e-c1').value) || null,
-        c2:         Number(document.getElementById('e-c2').value) || null,
-        charge:     chargeVal !== '' ? chargeVal : null,
-        bell_type:  document.getElementById('e-belltype').value.trim() || null,
-        etc:        etcVal    !== '' ? etcVal    : null,
-        new_phone_no: document.getElementById('e-phone').value.trim()
+        bell_name:   bellname || null,
+        region:      document.getElementById('e-region').value.trim() || null,
+        address:     address  || null,
+        lat:         latVal   !== '' ? Number(latVal)  : null,
+        lng:         lngVal   !== '' ? Number(lngVal)  : null,
+        machine_no:  machine  || null,
+        c1:          Number(c1val),
+        c2:          Number(c2val),
+        charge:      chargeVal !== '' ? chargeVal : null,
+        bell_type:   document.getElementById('e-belltype').value || null,
+        etc:         etcVal    !== '' ? etcVal    : null,
+        new_phone_no: phone
       };
 
       fetch('/api/bells/' + encodeURIComponent(origPhone), {
@@ -545,17 +560,21 @@
         body: JSON.stringify(body)
       })
       .then(function(res) {
-        if (res.ok) return res.json().then(function(j) {
-          if (j.ok) { closeEditModal(); loadData(); }
-          else alert('수정 실패: ' + (j.error || '알 수 없는 오류'));
-        });
         if (res.status === 403) { alert('권한이 없습니다(자기 지역 단말만 수정 가능).'); return; }
         if (res.status === 409) { alert('이미 존재하는 전화번호입니다.'); return; }
         if (res.status === 404) { alert('단말을 찾을 수 없습니다.'); return; }
-        return res.json().then(function(j) { alert('수정 실패: ' + (j.error || res.status)); });
+        return res.json().then(function(j) {
+          if (j.ok) {
+            alert('수정되었습니다.');
+            closeEditModal();
+            loadData();
+          } else {
+            alert('수정 실패: ' + (j.error || '알 수 없는 오류'));
+          }
+        });
       })
       .catch(function(e) {
-        console.error('[saveEditBell]', e);
+        console.error('[submitEdit]', e);
         alert('수정 실패: 네트워크 오류');
       });
     }
