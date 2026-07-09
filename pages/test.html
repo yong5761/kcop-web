@@ -95,7 +95,9 @@
                 <td style="padding:4px 8px 8px 0; white-space:nowrap; width:110px; font-weight:600; color:#4b637f;">대상 단말</td>
                 <td colspan="3" style="padding:4px 0 8px 0; border-bottom:1px solid #dfe3e8;">
                   <input id="devNo" type="text" value="01241715531" class="rmt-inp" style="width:160px;">
-                  <span style="margin-left:8px; color:#bbb; font-size:11px;">토픽 multibell/sm_{번호} + payload pnum 에 사용</span>
+                  <button id="devConnectBtn" onclick="devConnect();" style="margin-left:8px; padding:4px 14px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer; vertical-align:middle;">연결 요청</button>
+                  <span id="devConnectResult" style="margin-left:8px; font-size:12px; font-family:monospace; vertical-align:middle;"></span>
+                  <span style="display:block; margin-top:4px; color:#bbb; font-size:11px;">토픽 multibell/sm_{번호} + payload pnum 에 사용</span>
                 </td>
               </tr>
               <tr>
@@ -343,6 +345,52 @@
       var prev = document.getElementById(prevId);
       if (prev) { prev.focus(); prev.select(); }
     }
+  }
+
+  function devConnect() {
+    var devNo = document.getElementById('devNo').value.trim();
+    var resultEl = document.getElementById('devConnectResult');
+    var btn = document.getElementById('devConnectBtn');
+
+    if (!devNo) {
+      resultEl.style.color = '#cc0000';
+      resultEl.textContent = '단말번호를 입력하세요';
+      return;
+    }
+
+    var topic = 'hk-multii/MB_' + devNo + '/out';
+    var payload = { op: 100, pnum: devNo };
+    var payloadStr = JSON.stringify(payload);
+
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    resultEl.style.color = '#888';
+    resultEl.textContent = '발행 중...';
+
+    fetch('/api/mqtt/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ topic: topic, payload: payloadStr })
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (j.ok) {
+          resultEl.style.color = '#1a7a1a';
+          resultEl.textContent = '연결 요청 발행: ' + topic + ' → ' + payloadStr + ' (' + new Date().toISOString() + ')';
+        } else {
+          resultEl.style.color = '#cc0000';
+          resultEl.textContent = '연결 요청 실패: ' + (j.error || '알 수 없는 오류');
+        }
+      })
+      .catch(function(e) {
+        resultEl.style.color = '#cc0000';
+        resultEl.textContent = '연결 요청 실패: ' + e.message;
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
   }
 
   function rmtSave() {
