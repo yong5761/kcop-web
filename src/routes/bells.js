@@ -186,6 +186,60 @@ router.get('/api/bells/:phone/last-packet', async (req, res) => {
   }
 });
 
+router.post('/api/bells', async (req, res) => {
+  const user = req.session.user;
+  if (!user) return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });
+
+  const {
+    phone_no, bell_name, region, address, lat, lng, machine_no,
+    c1, c2, charge, bell_type, etc
+  } = req.body || {};
+
+  // 1) 전화번호 필수
+  if (!phone_no && phone_no !== 0) {
+    return res.status(400).json({ ok: false, error: '전화번호는 필수입니다.' });
+  }
+
+  // 2) 권한 체크 (본사 제외)
+  if (Number(user.mem_type) !== 1) {
+    const ic1 = Number(c1), ic2 = Number(c2);
+    const allowed = [
+      [user.c1,   user.c2  ],
+      [user.c1_2, user.c2_2],
+      [user.c1_3, user.c2_3],
+    ].some(([uc1, uc2]) =>
+      Number(uc1) > 0 && Number(uc2) > 0 &&
+      ic1 === Number(uc1) && ic2 === Number(uc2)
+    );
+    if (!allowed) return res.status(403).json({ ok: false, error: '권한이 없습니다.' });
+  }
+
+  const str = v => (v === '' || v == null) ? null : String(v);
+  const num = v => (v === '' || v == null) ? null : Number(v);
+
+  try {
+    // 3) 중복 체크
+    const [dup] = await pool.execute('SELECT 1 FROM bells WHERE phone_no = ?', [phone_no]);
+    if (dup.length) return res.status(409).json({ ok: false, error: '이미 존재하는 전화번호입니다.' });
+
+    // 4) INSERT
+    await pool.execute(
+      `INSERT INTO bells (phone_no, bell_name, region, address, lat, lng, machine_no, c1, c2, charge, bell_type, etc)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        phone_no, str(bell_name), str(region), str(address),
+        num(lat), num(lng), str(machine_no),
+        num(c1), num(c2),
+        str(charge), str(bell_type), str(etc)
+      ]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[API] POST /api/bells error:', e.message);
+    res.status(500).json({ ok: false, error: '서버 오류가 발생했습니다.' });
+  }
+});
+
 router.put('/api/bells/:phone', async (req, res) => {
   const user = req.session.user;
   if (!user) return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });

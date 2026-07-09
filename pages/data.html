@@ -131,7 +131,7 @@
 
         <p class="write_btn">
           <span class="link_btn_bg">
-            <a href="#" onclick="return false;" target="space">
+            <a href="#" onclick="openNewModal();return false;" target="space">
               <img src="../common/img/common/write_icon.png" alt=""
                    onerror="this.style.display='none';">
               &nbsp; 신규등록
@@ -193,7 +193,7 @@
     <!-- 수정 모달 -->
     <div id="edit-modal-overlay" onclick="if(event.target===this)closeEditModal();">
       <div id="edit-modal-box">
-        <p class="pop_tt_bg">장비정보관리</p>
+        <p class="pop_tt_bg" id="edit-modal-title">장비정보관리</p>
         <div style="width:95%; padding:10px 0 20px; margin-left:2.5%;">
           <input type="hidden" id="e-orig-phone">
           <table class="write">
@@ -295,6 +295,7 @@
 
     var bigCartData = [];
     var jungCartData = [];
+    var modalMode = 'edit'; // 'edit' | 'new'
 
     function loadCartData() {
       fetch('/api/members/big-cart', { credentials: 'same-origin' })
@@ -440,9 +441,28 @@
         .catch(function() {});
     }
 
-    /* ── 수정 모달 ── */
+    /* ── 신규/수정 모달 ── */
+
+    function openNewModal() {
+      modalMode = 'new';
+      document.getElementById('e-orig-phone').value  = '';
+      document.getElementById('e-machine').value     = '';
+      document.getElementById('e-bellname').value    = '';
+      document.getElementById('e-lat').value         = '';
+      document.getElementById('e-lng').value         = '';
+      document.getElementById('e-region').value      = '';
+      document.getElementById('e-address').value     = '';
+      document.getElementById('e-phone').value       = '';
+      document.getElementById('e-charge').value      = '';
+      document.getElementById('e-etc').value         = '';
+      document.getElementById('e-belltype').value    = '비상벨';
+      buildC1Select('');
+      buildC2Select('', '');
+      document.getElementById('edit-modal-overlay').style.display = 'block';
+    }
 
     function openEditModal(phone) {
+      modalMode = 'edit';
       var r = null;
       for (var i = 0; i < allRows.length; i++) {
         if (String(allRows[i].phone_no) === String(phone)) { r = allRows[i]; break; }
@@ -521,58 +541,71 @@
       var phone    = document.getElementById('e-phone').value.trim();
       var address  = document.getElementById('e-address').value.trim();
 
-      if (!machine || machine.length > 20)  { alert('장비번호를 확인해주세요(1~20자).'); return; }
-      if (!bellname || bellname.length > 30) { alert('비상벨명을 확인해주세요(1~30자).'); return; }
-      if (!phone || phone.length > 20)      { alert('전화번호를 확인해주세요(1~20자).'); return; }
-      if (address.length > 200)             { alert('설치주소는 200자 이내로 입력해주세요.'); return; }
+      if (!machine || machine.length > 20)   { alert('장비번호를 확인해주세요(1~20자).'); return; }
+      if (!bellname || bellname.length > 30)  { alert('비상벨명을 확인해주세요(1~30자).'); return; }
+      if (!phone || phone.length > 20)        { alert('전화번호를 확인해주세요(1~20자).'); return; }
+      if (address.length > 200)               { alert('설치주소는 200자 이내로 입력해주세요.'); return; }
 
-      if (!confirm('수정 하시겠습니까?')) return;
-
-      var origPhone = document.getElementById('e-orig-phone').value;
       var latVal    = document.getElementById('e-lat').value.trim();
       var lngVal    = document.getElementById('e-lng').value.trim();
       var chargeVal = document.getElementById('e-charge').value.trim();
       var etcVal    = document.getElementById('e-etc').value.trim();
 
-      var body = {
-        bell_name:   bellname || null,
-        region:      document.getElementById('e-region').value.trim() || null,
-        address:     address  || null,
-        lat:         latVal   !== '' ? Number(latVal)  : null,
-        lng:         lngVal   !== '' ? Number(lngVal)  : null,
-        machine_no:  machine  || null,
-        c1:          Number(c1val),
-        c2:          Number(c2val),
-        charge:      chargeVal !== '' ? chargeVal : null,
-        bell_type:   document.getElementById('e-belltype').value || null,
-        etc:         etcVal    !== '' ? etcVal    : null,
-        new_phone_no: phone
+      var commonFields = {
+        bell_name:  bellname || null,
+        region:     document.getElementById('e-region').value.trim() || null,
+        address:    address  || null,
+        lat:        latVal   !== '' ? Number(latVal)  : null,
+        lng:        lngVal   !== '' ? Number(lngVal)  : null,
+        machine_no: machine  || null,
+        c1:         Number(c1val),
+        c2:         Number(c2val),
+        charge:     chargeVal !== '' ? chargeVal : null,
+        bell_type:  document.getElementById('e-belltype').value || null,
+        etc:        etcVal    !== '' ? etcVal    : null
       };
 
-      fetch('/api/bells/' + encodeURIComponent(origPhone), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(body)
-      })
-      .then(function(res) {
-        if (res.status === 403) { alert('권한이 없습니다(자기 지역 단말만 수정 가능).'); return; }
-        if (res.status === 409) { alert('이미 존재하는 전화번호입니다.'); return; }
-        if (res.status === 404) { alert('단말을 찾을 수 없습니다.'); return; }
-        return res.json().then(function(j) {
-          if (j.ok) {
-            alert('수정되었습니다.');
-            closeEditModal();
-            loadData();
-          } else {
-            alert('수정 실패: ' + (j.error || '알 수 없는 오류'));
-          }
-        });
-      })
-      .catch(function(e) {
-        console.error('[submitEdit]', e);
-        alert('수정 실패: 네트워크 오류');
-      });
+      if (modalMode === 'new') {
+        if (!confirm('등록 하시겠습니까?')) return;
+        var body = Object.assign({ phone_no: phone }, commonFields);
+        fetch('/api/bells', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(body)
+        })
+        .then(function(res) {
+          if (res.status === 403) { alert('권한이 없습니다(자기 지역만 등록 가능).'); return; }
+          if (res.status === 409) { alert('이미 존재하는 전화번호입니다.'); return; }
+          if (res.status === 400) return res.json().then(function(j) { alert(j.error || '입력값을 확인해주세요.'); });
+          return res.json().then(function(j) {
+            if (j.ok) { alert('등록되었습니다.'); closeEditModal(); loadData(); }
+            else alert('등록 실패: ' + (j.error || '알 수 없는 오류'));
+          });
+        })
+        .catch(function(e) { console.error('[submitEdit/new]', e); alert('등록 실패: 네트워크 오류'); });
+
+      } else {
+        if (!confirm('수정 하시겠습니까?')) return;
+        var origPhone = document.getElementById('e-orig-phone').value;
+        var body = Object.assign({ new_phone_no: phone }, commonFields);
+        fetch('/api/bells/' + encodeURIComponent(origPhone), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify(body)
+        })
+        .then(function(res) {
+          if (res.status === 403) { alert('권한이 없습니다(자기 지역 단말만 수정 가능).'); return; }
+          if (res.status === 409) { alert('이미 존재하는 전화번호입니다.'); return; }
+          if (res.status === 404) { alert('단말을 찾을 수 없습니다.'); return; }
+          return res.json().then(function(j) {
+            if (j.ok) { alert('수정되었습니다.'); closeEditModal(); loadData(); }
+            else alert('수정 실패: ' + (j.error || '알 수 없는 오류'));
+          });
+        })
+        .catch(function(e) { console.error('[submitEdit/edit]', e); alert('수정 실패: 네트워크 오류'); });
+      }
     }
 
     loadCartData();
