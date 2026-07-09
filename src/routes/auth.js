@@ -20,7 +20,7 @@ router.post('/api/login', async (req, res) => {
 
   try {
     const [rows] = await pool.execute(
-      'SELECT idx, mem_id, mem_name, mem_type, mem_pwd, mem_pwd_hash FROM MEMBER WHERE mem_id = ?',
+      'SELECT idx, mem_id, mem_name, mem_type, mem_pwd, mem_pwd_hash, gateway_no FROM MEMBER WHERE mem_id = ?',
       [mem_id]
     );
 
@@ -75,7 +75,8 @@ router.post('/api/login', async (req, res) => {
       idx: row.idx,
       mem_id: row.mem_id,
       mem_name: row.mem_name,
-      mem_type: row.mem_type
+      mem_type: row.mem_type,
+      gateway_no: row.gateway_no || null
     };
 
     console.log('[login] 성공, mem_id:', mem_id, 'mem_type:', row.mem_type);
