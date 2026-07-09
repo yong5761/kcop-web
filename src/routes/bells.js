@@ -185,4 +185,95 @@ router.get('/api/bells/:phone/last-packet', async (req, res) => {
   }
 });
 
+router.put('/api/bells/:phone', async (req, res) => {
+  const user = req.session.user;
+  if (!user) return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });
+
+  const oldPhone = req.params.phone;
+  const {
+    bell_name, region, address, lat, lng, machine_no,
+    c1, c2, charge, bell_type, etc, new_phone_no
+  } = req.body || {};
+
+  // 1) 대상 단말 조회
+  let bellRow;
+  try {
+    const [rows] = await pool.execute('SELECT c1, c2 FROM bells WHERE phone_no = ?', [oldPhone]);
+    if (!rows.length) return res.status(404).json({ ok: false, error: '단말을 찾을 수 없습니다.' });
+    bellRow = rows[0];
+  } catch (e) {
+    console.error('[API] PUT /api/bells/:phone select error:', e.message);
+    return res.status(500).json({ ok: false, error: '서버 오류가 발생했습니다.' });
+  }
+
+  // 2) 권한 체크 (본사 제외)
+  if (Number(user.mem_type) !== 1) {
+    const bc1 = Number(bellRow.c1), bc2 = Number(bellRow.c2);
+    const allowed = [
+      [user.c1,   user.c2  ],
+      [user.c1_2, user.c2_2],
+      [user.c1_3, user.c2_3],
+    ].some(([uc1, uc2]) =>
+      Number(uc1) > 0 && Number(uc2) > 0 &&
+      bc1 === Number(uc1) && bc2 === Number(uc2)
+    );
+    if (!allowed) return res.status(403).json({ ok: false, error: '권한이 없습니다.' });
+  }
+
+  const str = v => (v === '' || v == null) ? null : String(v);
+  const num = v => (v === '' || v == null) ? null : Number(v);
+
+  const fields = [
+    str(bell_name), str(region), str(address),
+    num(lat), num(lng), str(machine_no),
+    num(c1), num(c2),
+    str(charge), str(bell_type), str(etc),
+  ];
+
+  const newP = (new_phone_no != null && String(new_phone_no) !== '' && String(new_phone_no) !== String(oldPhone))
+    ? String(new_phone_no) : null;
+
+  try {
+    if (!newP) {
+      // phone_no 미변경: 단순 UPDATE
+      await pool.execute(
+        `UPDATE bells
+         SET bell_name=?, region=?, address=?, lat=?, lng=?, machine_no=?,
+             c1=?, c2=?, charge=?, bell_type=?, etc=?
+         WHERE phone_no=?`,
+        [...fields, oldPhone]
+      );
+    } else {
+      // phone_no 변경: 중복 확인 후 트랜잭션
+      const [dup] = await pool.execute('SELECT 1 FROM bells WHERE phone_no=?', [newP]);
+      if (dup.length) return res.status(409).json({ ok: false, error: '이미 존재하는 전화번호입니다.' });
+
+      const conn = await pool.getConnection();
+      try {
+        await conn.beginTransaction();
+        await conn.execute(
+          `UPDATE bells
+           SET phone_no=?, bell_name=?, region=?, address=?, lat=?, lng=?, machine_no=?,
+               c1=?, c2=?, charge=?, bell_type=?, etc=?
+           WHERE phone_no=?`,
+          [newP, ...fields, oldPhone]
+        );
+        await conn.execute('UPDATE bell_logs   SET phone_no=? WHERE phone_no=?', [newP, oldPhone]);
+        await conn.execute('UPDATE bell_events SET phone_no=? WHERE phone_no=?', [newP, oldPhone]);
+        await conn.execute('UPDATE bell_latest SET phone_no=? WHERE phone_no=?', [newP, oldPhone]);
+        await conn.commit();
+      } catch (e) {
+        await conn.rollback();
+        throw e;
+      } finally {
+        conn.release();
+      }
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[API] PUT /api/bells/:phone error:', e.message);
+    res.status(500).json({ ok: false, error: '서버 오류가 발생했습니다.' });
+  }
+});
+
 module.exports = router;
