@@ -67,13 +67,11 @@ app.use(function authGate(req, res, next) {
   // 역할 검사: 본사(mem_type=1)가 아니면 전용 페이지·API 차단
   const isAdmin = Number(req.session.user.mem_type) === 1;
   if (!isAdmin) {
-    const ADMIN_PAGES = ['/pages/member.html', '/pages/sendlog.html', '/pages/test.html'];
+    const ADMIN_PAGES = ['/pages/member.html', '/pages/sendlog.html'];
     if (ADMIN_PAGES.includes(p)) {
       return res.redirect('/pages/layout.html');
     }
-    if (p.startsWith('/api/members') ||
-        p === '/api/mqtt/publish' ||
-        p === '/api/mqtt/connection-status') {
+    if (p.startsWith('/api/members')) {
       return res.status(403).json({ ok: false, error: '권한이 없습니다.' });
     }
   }
