@@ -67,25 +67,47 @@ router.get('/api/bells/:phone/logs', async (req, res) => {
 
 router.get('/api/stats/summary', async (req, res) => {
   try {
+    const rf = regionFilter(req.session.user, 'b');
+    const isAdmin = !req.session.user || req.session.user.mem_type === 1;
+
     const [[{ total }]] = await pool.execute(
-      `SELECT COUNT(*) AS total FROM bells`
+      `SELECT COUNT(*) AS total FROM bells b WHERE 1=1 ${rf.clause}`,
+      rf.params
     );
     const [[{ normal, fault }]] = await pool.execute(
       `SELECT
          SUM(CASE WHEN bl.last_seen IS NOT NULL AND bl.last_seen >= (NOW() - INTERVAL 150 MINUTE) THEN 1 ELSE 0 END) AS normal,
          SUM(CASE WHEN bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 150 MINUTE) THEN 1 ELSE 0 END) AS fault
        FROM bells b
-       LEFT JOIN bell_latest bl ON b.phone_no = bl.phone_no`
+       LEFT JOIN bell_latest bl ON b.phone_no = bl.phone_no
+       WHERE 1=1 ${rf.clause}`,
+      rf.params
     );
     const [[{ logs_24h }]] = await pool.execute(
       `SELECT COUNT(*) AS logs_24h FROM bell_logs WHERE received_at > NOW() - INTERVAL 1 DAY`
     );
-    const [[{ alarm_active }]] = await pool.execute(
-      `SELECT COUNT(*) AS alarm_active FROM bell_events WHERE status = '경보발생' AND resolved_at IS NULL`
-    );
-    const [[{ alarm_today }]] = await pool.execute(
-      `SELECT COUNT(*) AS alarm_today FROM bell_events WHERE occurred_at >= CURDATE()`
-    );
+    let alarm_active, alarm_today;
+    if (isAdmin) {
+      [[{ alarm_active }]] = await pool.execute(
+        `SELECT COUNT(*) AS alarm_active FROM bell_events WHERE status = '경보발생' AND resolved_at IS NULL`
+      );
+      [[{ alarm_today }]] = await pool.execute(
+        `SELECT COUNT(*) AS alarm_today FROM bell_events WHERE occurred_at >= CURDATE()`
+      );
+    } else {
+      [[{ alarm_active }]] = await pool.execute(
+        `SELECT COUNT(*) AS alarm_active
+         FROM bell_events e JOIN bells b ON e.phone_no = b.phone_no
+         WHERE e.status = '경보발생' AND e.resolved_at IS NULL ${rf.clause}`,
+        rf.params
+      );
+      [[{ alarm_today }]] = await pool.execute(
+        `SELECT COUNT(*) AS alarm_today
+         FROM bell_events e JOIN bells b ON e.phone_no = b.phone_no
+         WHERE e.occurred_at >= CURDATE() ${rf.clause}`,
+        rf.params
+      );
+    }
     res.json({ ok: true, total, normal, fault, logs_24h, alarm_active, alarm_today });
   } catch (e) {
     console.error('[API] GET /api/stats/summary error:', e.message);
