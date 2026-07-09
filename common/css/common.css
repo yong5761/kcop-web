@@ -139,3 +139,5 @@ body {background-color:#4b637f;  }
 .footer {width:100%; float:left; margin-top:20px; padding-left:1%; box-sizing: border-box; -moz-box-sizing: border-box;  }
 
 #topbar-username, a #topbar-username { color: #ffffff !important; }
+
+.admin-only { display: none; }

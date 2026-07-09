@@ -13,9 +13,9 @@ function loadTopbarUser() {
         var el = document.getElementById('topbar-username');
         if (el) el.textContent = d.user.mem_name;
       }
-      if (d.user.mem_type !== 1) {
+      if (d.user.mem_type === 1) {
         document.querySelectorAll('.admin-only').forEach(function(el) {
-          el.style.display = 'none';
+          el.style.removeProperty('display');
         });
       }
     })
