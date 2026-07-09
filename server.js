@@ -58,11 +58,27 @@ app.use(function authGate(req, res, next) {
   if (p.startsWith('/common/') || STATIC_EXTS.test(p)) return next();
 
   // 나머지: 로그인 필요
-  if (req.session && req.session.user) return next();
+  if (!(req.session && req.session.user)) {
+    return p.startsWith('/api/')
+      ? res.status(401).json({ ok: false, error: '로그인이 필요합니다.' })
+      : res.redirect('/pages/login.html');
+  }
 
-  return p.startsWith('/api/')
-    ? res.status(401).json({ ok: false, error: '로그인이 필요합니다.' })
-    : res.redirect('/pages/login.html');
+  // 역할 검사: 본사(mem_type=1)가 아니면 전용 페이지·API 차단
+  const isAdmin = Number(req.session.user.mem_type) === 1;
+  if (!isAdmin) {
+    const ADMIN_PAGES = ['/pages/member.html', '/pages/sendlog.html', '/pages/test.html'];
+    if (ADMIN_PAGES.includes(p)) {
+      return res.redirect('/pages/layout.html');
+    }
+    if (p.startsWith('/api/members') ||
+        p === '/api/mqtt/publish' ||
+        p === '/api/mqtt/connection-status') {
+      return res.status(403).json({ ok: false, error: '권한이 없습니다.' });
+    }
+  }
+
+  return next();
 });
 
 app.use(express.static(path.join(__dirname)));
