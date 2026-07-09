@@ -347,6 +347,8 @@
     }
   }
 
+  var CONN_TOPIC = 'hk-multii/MB_01241715531/out';
+
   function devConnect() {
     var devNo = document.getElementById('devNo').value.trim();
     var resultEl = document.getElementById('devConnectResult');
@@ -358,7 +360,7 @@
       return;
     }
 
-    var topic = 'hk-multii/MB_' + devNo + '/out';
+    var topic = CONN_TOPIC;
     var payload = { op: 100, pnum: devNo };
     var payloadStr = JSON.stringify(payload);
 
