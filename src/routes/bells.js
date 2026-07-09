@@ -95,14 +95,17 @@ router.get('/api/stats/summary', async (req, res) => {
 
 router.get('/api/events', async (req, res) => {
   try {
+    const { clause, params } = regionFilter(req.session.user, 'b');
     const [rows] = await pool.execute(
       `SELECT e.id, e.phone_no, e.machine_no, e.bell_name, e.region, e.address,
               e.bell_number, e.status, e.occurred_at, e.resolved_at,
               b.lat, b.lng
        FROM bell_events e
        LEFT JOIN bells b ON e.phone_no = b.phone_no
+       WHERE 1=1 ${clause}
        ORDER BY e.occurred_at DESC
-       LIMIT 200`
+       LIMIT 200`,
+      params
     );
     res.json({ ok: true, rows });
   } catch (e) {
