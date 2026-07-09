@@ -40,7 +40,7 @@
             <td style="float:right;">
               <img src="../common/img/common/top_icon.png" alt="" style="margin-top:5px;"
                    onerror="this.style.display='none';">
-              &nbsp;<a href="#" onclick="alert('프로그래머 기능 준비 중');return false;" target="space">프로그래머</a>
+              &nbsp;<a href="#" onclick="alert('프로그래머 기능 준비 중');return false;" target="space"><span id="topbar-username">프로그래머</span></a>
             </td>
             <td style="float:right;">
               <a href="#" onclick="alert('공지사항 기능 준비 중');return false;" target="space">공지사항 &nbsp;
@@ -343,6 +343,7 @@
 
     loadData();
     setInterval(loadData, 30000);
+    loadTopbarUser();
   </script>
 
 </body>

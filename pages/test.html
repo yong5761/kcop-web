@@ -39,7 +39,7 @@
           </div>
         </td>
         <td style="float:right;"><a href="#" onclick="doLogout();return false;" title=""><img src="../common/img/common/logout_btn.png" alt="로그아웃" style="margin-top:2px;" /></a></td>
-        <td style="float:right;"><img src="../common/img/common/top_icon.png" alt="" style="margin-top:5px;" />&nbsp; <a href="#" onclick="return false;" target="space">프로그래머</a></td>
+        <td style="float:right;"><img src="../common/img/common/top_icon.png" alt="" style="margin-top:5px;" />&nbsp; <a href="#" onclick="return false;" target="space"><span id="topbar-username">프로그래머</span></a></td>
         <td style="float:right;"><a href="#" onclick="return false;" target="space">공지사항 &nbsp;<span class="no" style="float:right;">0</span></a></td>
       </tr>
     </table>
@@ -496,12 +496,16 @@
     })
     .catch(function() {});
 
-  // 로그인 계정의 gateway_no → gwNo 입력창 자동 세팅
+  // 로그인 계정 정보: gwNo 자동 세팅 + 우상단 이름 표시
   fetch('/api/me', { credentials: 'same-origin' })
     .then(function(r) { return r.json(); })
     .then(function(j) {
-      if (j.ok && j.user && j.user.gateway_no) {
-        document.getElementById('gwNo').value = j.user.gateway_no;
+      if (j.ok && j.user) {
+        if (j.user.gateway_no) {
+          document.getElementById('gwNo').value = j.user.gateway_no;
+        }
+        var el = document.getElementById('topbar-username');
+        if (el && j.user.mem_name) el.textContent = j.user.mem_name;
       }
     })
     .catch(function() {});
