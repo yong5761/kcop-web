@@ -92,12 +92,19 @@
           <div id="tabContentGen" style="background:#fff; padding:14px 18px;">
             <table class="rmt-form-table" style="border-collapse:collapse; font-size:13px; color:#333;">
               <tr>
+                <td style="padding:4px 8px 4px 0; white-space:nowrap; width:110px; font-weight:600; color:#4b637f;">게이트웨이 번호</td>
+                <td colspan="3" style="padding:4px 0 4px 0;">
+                  <input id="gwNo" type="text" value="01241715531" class="rmt-inp" style="width:160px;">
+                  <span style="margin-left:8px; color:#bbb; font-size:11px;">연결 요청 토픽 hk-multii/MB_{이 번호}/out 에 사용</span>
+                </td>
+              </tr>
+              <tr>
                 <td style="padding:4px 8px 8px 0; white-space:nowrap; width:110px; font-weight:600; color:#4b637f;">대상 단말</td>
                 <td colspan="3" style="padding:4px 0 8px 0; border-bottom:1px solid #dfe3e8;">
                   <input id="devNo" type="text" value="01241715531" class="rmt-inp" style="width:160px;">
                   <button id="devConnectBtn" onclick="devConnect();" style="margin-left:8px; padding:4px 14px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer; vertical-align:middle;">연결 요청</button>
                   <span id="devConnectResult" style="margin-left:8px; font-size:12px; font-family:monospace; vertical-align:middle;"></span>
-                  <span style="display:block; margin-top:4px; color:#bbb; font-size:11px;">토픽 multibell/sm_{번호} + payload pnum 에 사용</span>
+                  <span style="display:block; margin-top:4px; color:#bbb; font-size:11px;">토픽 pnum / 세팅 발행 토픽 hk-multii/MB_{이 번호}/out 에 사용</span>
                 </td>
               </tr>
               <tr>
@@ -347,20 +354,24 @@
     }
   }
 
-  var CONN_TOPIC = 'hk-multii/MB_01241715531/out';
-
   function devConnect() {
     var devNo = document.getElementById('devNo').value.trim();
+    var gwNo = document.getElementById('gwNo').value.trim();
     var resultEl = document.getElementById('devConnectResult');
     var btn = document.getElementById('devConnectBtn');
 
+    if (!gwNo) {
+      resultEl.style.color = '#cc0000';
+      resultEl.textContent = '게이트웨이 번호를 입력하세요';
+      return;
+    }
     if (!devNo) {
       resultEl.style.color = '#cc0000';
       resultEl.textContent = '단말번호를 입력하세요';
       return;
     }
 
-    var topic = CONN_TOPIC;
+    var topic = 'hk-multii/MB_' + gwNo + '/out';
     var payload = { op: 100, pnum: devNo };
     var payloadStr = JSON.stringify(payload);
 
