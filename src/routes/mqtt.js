@@ -42,6 +42,16 @@ router.get('/api/mqtt/connection-status', (req, res) => {
   return res.json({ ok: true, connected: false });
 });
 
+router.get('/api/mqtt/general-status', (req, res) => {
+  const devNo = String(req.query.devNo || '').trim();
+  if (!devNo) return res.status(400).json({ ok: false, error: 'devNo 파라미터 필요' });
+  const data = ingest.getGeneral(devNo);
+  if (data && (Date.now() - data.at) <= 30000) {
+    return res.json({ ok: true, received: true, payload: data.payload, at: new Date(data.at).toISOString() });
+  }
+  return res.json({ ok: true, received: false });
+});
+
 router.get('/api/mqtt/easysound-status', (req, res) => {
   const devNo = String(req.query.devNo || '').trim();
   if (!devNo) return res.status(400).json({ ok: false, error: 'devNo 파라미터 필요' });

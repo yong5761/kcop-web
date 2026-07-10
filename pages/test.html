@@ -206,8 +206,10 @@
                 SMS 벨번호 추가
               </label>
             </div>
-            <div style="margin-top:14px;">
+            <div style="margin-top:14px; display:flex; align-items:center; gap:10px;">
+              <button id="genReadBtn" onclick="readGeneral();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">읽기</button>
               <button id="rmtSaveBtn" onclick="rmtSave();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">저장</button>
+              <span id="genResult" style="font-size:12px; font-family:monospace;"></span>
             </div>
           </div>
           <div id="tabContentEs" style="display:none; background:#fff; padding:14px 18px;">
@@ -610,6 +612,127 @@
         btn.disabled = false;
         btn.style.opacity = '1';
       });
+  }
+
+  function hexToEuckr(hex) {
+    if (!hex) return '';
+    var bytes = [];
+    for (var i = 0; i + 1 < hex.length; i += 2) bytes.push(parseInt(hex.substr(i, 2), 16));
+    try { return new TextDecoder('euc-kr').decode(new Uint8Array(bytes)); }
+    catch (e) { return ''; }
+  }
+
+  function setTgl(cbId, val) {
+    var cb = document.getElementById(cbId);
+    if (!cb) return;
+    cb.checked = !!val;
+    var tgl = cb.parentNode ? cb.parentNode.querySelector('.rmt-tgl') : null;
+    if (tgl) {
+      if (val) tgl.classList.add('on'); else tgl.classList.remove('on');
+    }
+  }
+
+  function readGeneral() {
+    var g = function(id) { return document.getElementById(id); };
+    var devNo = g('devNo').value.trim();
+    var btn = g('genReadBtn');
+    var resultEl = g('genResult');
+    if (!devNo) {
+      resultEl.style.color = '#cc0000';
+      resultEl.textContent = '단말번호를 입력하세요';
+      return;
+    }
+    var topic = 'hk-multii/MB_' + devNo + '/out';
+
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    resultEl.style.color = '#888';
+    resultEl.textContent = '읽기 요청 발행 중...';
+
+    fetch('/api/mqtt/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ topic: topic, payload: JSON.stringify({ op: 11, cmd: 0 }) })
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (!j.ok) {
+          resultEl.style.color = '#cc0000';
+          resultEl.textContent = '발행 실패: ' + (j.error || '알 수 없는 오류');
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          return;
+        }
+        resultEl.style.color = '#888';
+        resultEl.textContent = '발행 완료 → 응답 대기중...';
+        startGenPoll(devNo, btn, resultEl);
+      })
+      .catch(function(e) {
+        resultEl.style.color = '#cc0000';
+        resultEl.textContent = '발행 오류: ' + e.message;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
+  }
+
+  function startGenPoll(devNo, btn, resultEl) {
+    var maxTries = 8;
+    var tries = 0;
+    var g = function(id) { return document.getElementById(id); };
+    var timer = setInterval(function() {
+      tries++;
+      fetch('/api/mqtt/general-status?devNo=' + encodeURIComponent(devNo), {
+        credentials: 'same-origin'
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(j) {
+          if (j.ok && j.received) {
+            clearInterval(timer);
+            var p = j.payload;
+            if (p.t1 != null) g('tel1').value = p.t1;
+            if (p.t2 != null) g('tel2').value = p.t2;
+            if (p.t3 != null) g('tel3').value = p.t3;
+            if (p.t4 != null) g('tel4').value = p.t4;
+            if (p.t5 != null) g('tel5').value = p.t5;
+            g('sms').value = hexToEuckr(p.m);
+            if (p.machineNum != null) g('uid').value = p.machineNum;
+            if (p.duration != null) g('bellhold').value = (Number(p.duration) || 0) + 10;
+            if (p.tx700set != null) g('tx700').value = p.tx700set;
+            if (Array.isArray(p.serverip)) {
+              if (p.serverip.length > 0) g('ip1').value = p.serverip[0];
+              if (p.serverip.length > 1) g('ip2').value = p.serverip[1];
+              if (p.serverip.length > 2) g('ip3').value = p.serverip[2];
+              if (p.serverip.length > 3) g('ip4').value = p.serverip[3];
+            }
+            if (p.serverport != null) g('port').value = p.serverport;
+            if (p.screemref != null) g('screemStd').value = p.screemref;
+            if (p.phonevol != null) g('phone').value = p.phonevol;
+            if (p.phonemic != null) g('mic').value = p.phonemic;
+            if (p.resetinterval != null) g('resetInterval').value = p.resetinterval;
+            if (p.noanswertime != null) g('noresp').value = p.noanswertime;
+            setTgl('tglTel12', Number(p.bell_even_odd) === 1);
+            setTgl('tglSmsBell', Number(p.addsmsbellnum) === 1);
+            resultEl.style.color = '#1a7a1a';
+            resultEl.textContent = '✅ 읽기 완료 (' + j.at + ')';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          } else if (tries >= maxTries) {
+            clearInterval(timer);
+            resultEl.style.color = '#b87700';
+            resultEl.textContent = '응답 없음 (단말 미응답)';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          }
+        })
+        .catch(function(e) {
+          clearInterval(timer);
+          resultEl.style.color = '#cc0000';
+          resultEl.textContent = '폴링 오류: ' + e.message;
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        });
+    }, 2000);
   }
 
   fetch('/api/stats/summary')

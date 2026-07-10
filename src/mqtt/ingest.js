@@ -6,6 +6,7 @@ const { parseBellData, topicToPhone } = require('./parseBellData');
 
 const connMap = new Map();
 const esMap = new Map();
+const genMap = new Map();
 
 function startIngest() {
   const client = mqtt.connect(process.env.MQTT_URL);
@@ -38,6 +39,10 @@ function startIngest() {
             at: Date.now()
           });
           console.log('[MQTT] /in op:7 이지사운드: pnum=%s', pnum);
+        }
+        if (data && data.op === 11) {
+          genMap.set(pnum, { payload: data, at: Date.now() });
+          console.log('[MQTT] /in op:11 일반설정: pnum=%s', pnum);
         }
       }
       return;
@@ -167,3 +172,4 @@ function startIngest() {
 module.exports = startIngest;
 module.exports.getConnAt = (pnum) => connMap.get(String(pnum));
 module.exports.getEasysound = (pnum) => esMap.get(String(pnum));
+module.exports.getGeneral = (pnum) => genMap.get(String(pnum));
