@@ -211,27 +211,24 @@
             </div>
           </div>
           <div id="tabContentEs" style="display:none; background:#fff; padding:14px 18px;">
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <button id="esTrigVolWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">트리거볼륨쓰기</button>
-                <input id="esTrigVol" type="text" value="5000" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                <button id="esTrigVolSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
-              </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <button id="esAccWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">정확도쓰기</button>
-                <input id="esAcc" type="text" value="40" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                <button id="esAccSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
-              </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <button id="esMicVolWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">마이크볼륨쓰기</button>
-                <input id="esMicVol" type="text" value="0" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                <button id="esMicVolSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
-              </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <button id="esTrigSensWrite" style="width:180px; padding:5px 0; font-size:13px; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">트리거감도쓰기</button>
-                <input id="esTrigSens" type="text" value="40" inputmode="numeric" class="rmt-inp" style="width:80px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                <button id="esTrigSensSend" style="padding:5px 14px; font-size:13px; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">전송</button>
-              </div>
+            <table class="rmt-form-table" style="border-collapse:collapse; font-size:13px; color:#333;">
+              <tr>
+                <td style="padding:4px 8px 4px 0; white-space:nowrap; width:110px;">트리거볼륨</td>
+                <td style="padding:4px 16px 4px 0;"><input id="esTrigVol" type="text" value="5000" inputmode="numeric" class="rmt-inp" style="width:100px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                <td style="padding:4px 8px 4px 0; white-space:nowrap; width:110px;">마이크볼륨</td>
+                <td style="padding:4px 0;"><input id="esMicVol" type="text" value="0" inputmode="numeric" class="rmt-inp" style="width:100px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+              </tr>
+              <tr>
+                <td style="padding:4px 8px 4px 0;">트리거감도</td>
+                <td style="padding:4px 16px 4px 0;"><input id="esTrigSens" type="text" value="40" inputmode="numeric" class="rmt-inp" style="width:100px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+                <td style="padding:4px 8px 4px 0;">정확도</td>
+                <td style="padding:4px 0;"><input id="esAcc" type="text" value="40" inputmode="numeric" class="rmt-inp" style="width:100px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"></td>
+              </tr>
+            </table>
+            <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
+              <button id="esReadBtn" onclick="readEasysound();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">읽기</button>
+              <button id="esSaveBtn" onclick="saveEasysound();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">저장</button>
+              <span id="esResult" style="font-size:12px; font-family:monospace;"></span>
             </div>
           </div>
         </div>
@@ -482,6 +479,137 @@
     tEs.className = isGen ? 'rmt-tab-inact' : 'rmt-tab-act';
     cGen.style.display = isGen ? 'block' : 'none';
     cEs.style.display = isGen ? 'none' : 'block';
+  }
+
+  function readEasysound() {
+    var devNo = document.getElementById('devNo').value.trim();
+    var btn = document.getElementById('esReadBtn');
+    var resultEl = document.getElementById('esResult');
+    if (!devNo) {
+      resultEl.style.color = '#cc0000';
+      resultEl.textContent = '단말번호를 입력하세요';
+      return;
+    }
+    var topic = 'hk-multii/MB_' + devNo + '/out';
+
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    resultEl.style.color = '#888';
+    resultEl.textContent = '읽기 요청 발행 중...';
+
+    fetch('/api/mqtt/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ topic: topic, payload: JSON.stringify({ op: 9 }) })
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (!j.ok) {
+          resultEl.style.color = '#cc0000';
+          resultEl.textContent = '발행 실패: ' + (j.error || '알 수 없는 오류');
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          return;
+        }
+        resultEl.style.color = '#888';
+        resultEl.textContent = '발행 완료 → 응답 대기중...';
+        startEsPoll(devNo, btn, resultEl);
+      })
+      .catch(function(e) {
+        resultEl.style.color = '#cc0000';
+        resultEl.textContent = '발행 오류: ' + e.message;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
+  }
+
+  function startEsPoll(devNo, btn, resultEl) {
+    var maxTries = 8;
+    var tries = 0;
+    var timer = setInterval(function() {
+      tries++;
+      fetch('/api/mqtt/easysound-status?devNo=' + encodeURIComponent(devNo), {
+        credentials: 'same-origin'
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(j) {
+          if (j.ok && j.received) {
+            clearInterval(timer);
+            document.getElementById('esTrigVol').value = j.trigvol != null ? j.trigvol : '';
+            document.getElementById('esMicVol').value = j.micvol != null ? j.micvol : '';
+            document.getElementById('esTrigSens').value = j.trigsens != null ? j.trigsens : '';
+            document.getElementById('esAcc').value = j.accuracy != null ? j.accuracy : '';
+            resultEl.style.color = '#1a7a1a';
+            resultEl.textContent = '✅ 읽기 완료 (' + j.at + ')';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          } else if (tries >= maxTries) {
+            clearInterval(timer);
+            resultEl.style.color = '#b87700';
+            resultEl.textContent = '응답 없음 (단말 미응답)';
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          }
+        })
+        .catch(function(e) {
+          clearInterval(timer);
+          resultEl.style.color = '#cc0000';
+          resultEl.textContent = '폴링 오류: ' + e.message;
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        });
+    }, 2000);
+  }
+
+  function saveEasysound() {
+    var devNo = document.getElementById('devNo').value.trim();
+    var btn = document.getElementById('esSaveBtn');
+    var resultEl = document.getElementById('esResult');
+    if (!devNo) {
+      resultEl.style.color = '#cc0000';
+      resultEl.textContent = '단말번호를 입력하세요';
+      return;
+    }
+    var numOr0 = function(v) { var n = Number(v); return isNaN(n) ? 0 : n; };
+    var topic = 'hk-multii/MB_' + devNo + '/out';
+    var payload = {
+      op: 7,
+      trigvol: numOr0(document.getElementById('esTrigVol').value),
+      micvol: numOr0(document.getElementById('esMicVol').value),
+      trigsens: numOr0(document.getElementById('esTrigSens').value),
+      accuracy: numOr0(document.getElementById('esAcc').value)
+    };
+
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    resultEl.style.color = '#888';
+    resultEl.textContent = '저장 발행 중...';
+
+    fetch('/api/mqtt/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ topic: topic, payload: JSON.stringify(payload) })
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (j.ok) {
+          resultEl.style.color = '#1a7a1a';
+          resultEl.textContent = '✅ 저장 발행 완료 (' + j.published_at + ')';
+        } else {
+          resultEl.style.color = '#cc0000';
+          resultEl.textContent = '발행 실패: ' + (j.error || '알 수 없는 오류');
+        }
+      })
+      .catch(function(e) {
+        resultEl.style.color = '#cc0000';
+        resultEl.textContent = '발행 오류: ' + e.message;
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
   }
 
   fetch('/api/stats/summary')

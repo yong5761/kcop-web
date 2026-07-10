@@ -5,6 +5,7 @@ const pool = require('../db');
 const { parseBellData, topicToPhone } = require('./parseBellData');
 
 const connMap = new Map();
+const esMap = new Map();
 
 function startIngest() {
   const client = mqtt.connect(process.env.MQTT_URL);
@@ -30,6 +31,14 @@ function startIngest() {
       if (pnum) {
         connMap.set(pnum, Date.now());
         console.log('[MQTT] /in 연결응답: pnum=%s', pnum);
+        if (data && data.op === 7) {
+          esMap.set(pnum, {
+            trigvol: data.trigvol, micvol: data.micvol,
+            trigsens: data.trigsens, accuracy: data.accuracy,
+            at: Date.now()
+          });
+          console.log('[MQTT] /in op:7 이지사운드: pnum=%s', pnum);
+        }
       }
       return;
     }
@@ -157,3 +166,4 @@ function startIngest() {
 
 module.exports = startIngest;
 module.exports.getConnAt = (pnum) => connMap.get(String(pnum));
+module.exports.getEasysound = (pnum) => esMap.get(String(pnum));
