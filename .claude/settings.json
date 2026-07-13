@@ -75,7 +75,16 @@
       "Bash(ssh -p 1022 -o StrictHostKeyChecking=no root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop && pm2 logs kcop --lines 10 --nostream\")",
       "Bash(ssh -p 22 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop && pm2 logs kcop --lines 10 --nostream\")",
       "Bash(ssh -p 2540 -o StrictHostKeyChecking=no -o ConnectTimeout=15 root@211.115.76.21 \"mysql -u dbeaver -pDbeaver2024! kcop -e \\\\\"SHOW TABLES;\\\\\"\")",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop && pm2 status kcop\")",
+      "Bash(ssh -o StrictHostKeyChecking=no -p 2540 root@211.115.76.21 \"mysql -u root -e \\\\\"SELECT p_num, bell_type, charge, etc FROM PRODUCT LIMIT 20;\\\\\" kcop 2>/dev/null || mysql -u kcop -e \\\\\"SELECT p_num, bell_type, charge, etc FROM PRODUCT LIMIT 20;\\\\\" kcop\")",
+      "Bash(sshpass -p '231218hks^@\\)' ssh -o StrictHostKeyChecking=no -p 2540 root@211.115.76.21 \"mysql -u root --default-character-set=utf8 -e 'SELECT p_num, bell_type, charge, etc FROM PRODUCT;' kcop 2>/dev/null\")",
+      "Bash(ssh -o *)",
+      "PowerShell(Get-Command putty -ErrorAction SilentlyContinue)",
+      "Bash(python3 -)",
+      "Bash(ssh -p 22 root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop\")",
+      "Bash(ssh -i ~/.ssh/id_rsa -p 22 root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop\")",
+      "Bash(ssh -i ~/.ssh/id_ed25519 -p 22 root@49.50.130.15 \"cd /data/kcop-web && git pull origin main && pm2 restart kcop\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\USER\\Desktop\\KcopWeb\\common",
