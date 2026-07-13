@@ -85,6 +85,7 @@ app.use('/', require('./src/routes/auth'));
 app.use('/', require('./src/routes/bells'));
 app.use('/', require('./src/routes/mqtt'));
 app.use('/', require('./src/routes/members'));
+app.use('/', require('./src/routes/dbconsole'));
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });

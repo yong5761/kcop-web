@@ -263,27 +263,19 @@
         </div>
       </div>
 
-      <div style="width:99.9%; float:left; background-color:#fff; margin-top:20px; padding:28px 24px; box-sizing:border-box;">
-
-        <div style="max-width:640px;">
-          <div style="margin-bottom:14px;">
-            <label style="display:block; font-size:13px; font-weight:600; color:#333; margin-bottom:5px;">토픽</label>
-            <input id="mqtt-topic" type="text" value="multibell/sm_01241715531"
-              style="width:100%; padding:7px 10px; font-size:13px; border:1px solid #ccc; border-radius:3px; box-sizing:border-box;" />
+      <div style="width:99.9%; float:left; background-color:#fff; margin-top:20px; padding:20px 24px; box-sizing:border-box;">
+        <div style="width:100%; border:1px solid #dfe3e8; border-radius:2px; overflow:hidden;">
+          <div style="background:#4b637f; color:#fff; font-size:14px; font-weight:600; padding:9px 14px;">DB 콘솔</div>
+          <div style="padding:14px 18px;">
+            <textarea id="sqlInput" rows="5" placeholder="SQL을 입력하세요 (예: SELECT * FROM bells LIMIT 5)"
+              style="width:100%; padding:7px 10px; font-size:13px; font-family:monospace; border:1px solid #c8d0db; border-radius:3px; box-sizing:border-box; resize:vertical; outline:none;"></textarea>
+            <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+              <button id="sqlRunBtn" onclick="runSql();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">실행</button>
+              <span id="sqlStatus" style="font-size:12px; font-family:monospace;"></span>
+            </div>
+            <div id="sqlResult" style="margin-top:12px; max-height:400px; overflow:auto;"></div>
           </div>
-          <div style="margin-bottom:14px;">
-            <label style="display:block; font-size:13px; font-weight:600; color:#333; margin-bottom:5px;">페이로드</label>
-            <textarea id="mqtt-payload" rows="4"
-              style="width:100%; padding:7px 10px; font-size:13px; font-family:monospace; border:1px solid #ccc; border-radius:3px; box-sizing:border-box; resize:vertical;">{"op":100,"pnum":"01058755761"}</textarea>
-          </div>
-          <div style="margin-bottom:18px;">
-            <button id="mqtt-btn" onclick="mqttPublish();"
-              style="padding:8px 28px; font-size:14px; font-weight:600; background-color:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">발행</button>
-            <span id="mqtt-warn" style="margin-left:12px; font-size:12px; color:#b8860b; display:none;">경고: JSON 형식이 아닐 수 있음</span>
-          </div>
-          <div id="mqtt-result" style="font-family:monospace; font-size:12px; line-height:1.7;"></div>
         </div>
-
       </div>
 
     </div>
@@ -305,58 +297,88 @@
     }
   })();
 
-  function mqttPublish() {
-    var topic = document.getElementById('mqtt-topic').value.trim();
-    var payload = document.getElementById('mqtt-payload').value;
-    var warnEl = document.getElementById('mqtt-warn');
-    var resultEl = document.getElementById('mqtt-result');
-    var btn = document.getElementById('mqtt-btn');
+  function escHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
 
-    if (!topic) {
-      appendResult('warn', '토픽을 입력하세요');
+  function runSql() {
+    var sql = document.getElementById('sqlInput').value.trim();
+    var btn = document.getElementById('sqlRunBtn');
+    var statusEl = document.getElementById('sqlStatus');
+    var resultEl = document.getElementById('sqlResult');
+
+    if (!sql) {
+      statusEl.style.color = '#888';
+      statusEl.textContent = 'SQL을 입력하세요';
       return;
-    }
-
-    try {
-      JSON.parse(payload);
-      warnEl.style.display = 'none';
-    } catch (e) {
-      warnEl.style.display = 'inline';
     }
 
     btn.disabled = true;
     btn.style.opacity = '0.6';
+    statusEl.style.color = '#888';
+    statusEl.textContent = '문법 확인 중...';
+    resultEl.innerHTML = '';
 
-    fetch('/api/mqtt/publish', {
+    fetch('/api/db/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic: topic, payload: payload })
+      credentials: 'same-origin',
+      body: JSON.stringify({ sql: sql })
     })
-      .then(function (res) { return res.json(); })
-      .then(function (j) {
-        if (j.ok) {
-          appendResult('ok', '발행 성공: ' + j.topic + ' → ' + j.payload + ' (' + j.published_at + ')');
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (!j.ok) {
+          statusEl.style.color = '#cc0000';
+          if (j.phase === 'syntax') {
+            statusEl.textContent = '문법 오류: ' + (j.error || '');
+          } else if (j.phase === 'execute') {
+            statusEl.textContent = '실행 오류: ' + (j.error || '');
+          } else {
+            statusEl.textContent = '오류: ' + (j.error || '');
+          }
+          return;
+        }
+        if (j.type === 'rows') {
+          statusEl.style.color = '#1a7a1a';
+          statusEl.textContent = j.rowCount + '행 조회';
+          var cols = j.columns || [];
+          var rows = j.rows || [];
+          var html = '<table style="border-collapse:collapse; font-size:12px; white-space:nowrap;">';
+          html += '<thead><tr>';
+          cols.forEach(function(c) {
+            html += '<th style="border:1px solid #c8d0db; padding:4px 8px; background:#eef1f5; color:#4b637f; font-weight:700;">' + escHtml(c) + '</th>';
+          });
+          html += '</tr></thead><tbody>';
+          rows.forEach(function(r) {
+            html += '<tr>';
+            cols.forEach(function(c) {
+              var v = r[c];
+              var display = v == null ? '<span style="color:#aaa;">null</span>' : escHtml(String(v));
+              html += '<td style="border:1px solid #e0e4eb; padding:3px 8px; vertical-align:top;">' + display + '</td>';
+            });
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+          resultEl.innerHTML = html;
         } else {
-          appendResult('err', '발행 실패: ' + (j.error || '알 수 없는 오류'));
+          statusEl.style.color = '#1a7a1a';
+          statusEl.textContent = '실행 완료 (' + j.affectedRows + '행 영향)';
+          resultEl.innerHTML = '<div style="font-size:12px; color:#555; padding:4px 0;">' +
+            'affectedRows: ' + escHtml(String(j.affectedRows)) +
+            ' | insertId: ' + escHtml(String(j.insertId)) +
+            (j.changedRows != null ? ' | changedRows: ' + escHtml(String(j.changedRows)) : '') +
+            (j.info ? ' | ' + escHtml(String(j.info)) : '') +
+            '</div>';
         }
       })
-      .catch(function (e) {
-        appendResult('err', '요청 오류: ' + e.message);
+      .catch(function(e) {
+        statusEl.style.color = '#cc0000';
+        statusEl.textContent = '오류: ' + e.message;
       })
-      .finally(function () {
+      .finally(function() {
         btn.disabled = false;
         btn.style.opacity = '1';
       });
-  }
-
-  function appendResult(type, msg) {
-    var color = type === 'ok' ? '#1a7a1a' : type === 'err' ? '#cc0000' : '#b8860b';
-    var el = document.getElementById('mqtt-result');
-    el.innerHTML = '<div style="color:' + color + '; padding:2px 0;">' + escHtml(msg) + '</div>';
-  }
-
-  function escHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   function rmtTgl(el, cbId) {
