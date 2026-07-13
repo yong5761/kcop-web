@@ -877,7 +877,7 @@
         });
         listEl.appendChild(wrap);
       })
-      .catch(function(e) { countEl.textContent = '요청 오류: ' + e.message; })
+      .catch(function(e) { countEl.textContent = '오류: ' + e.message; })
       .finally(function() { btn.disabled = false; btn.style.opacity = '1'; });
   }
 
