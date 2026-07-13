@@ -271,6 +271,7 @@
               style="width:100%; padding:7px 10px; font-size:13px; font-family:monospace; border:1px solid #c8d0db; border-radius:3px; box-sizing:border-box; resize:vertical; outline:none;"></textarea>
             <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
               <button id="sqlRunBtn" onclick="runSql();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">실행</button>
+              <button id="csvBtn" onclick="downloadCsv();" disabled style="padding:7px 18px; font-size:13px; font-weight:600; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer; opacity:0.4;">CSV 추출</button>
               <span id="sqlStatus" style="font-size:12px; font-family:monospace;"></span>
             </div>
             <div id="sqlResult" style="margin-top:12px; max-height:400px; overflow:auto;"></div>
@@ -338,6 +339,7 @@
           }
           return;
         }
+        var csvBtn = document.getElementById('csvBtn');
         if (j.type === 'rows') {
           statusEl.style.color = '#1a7a1a';
           statusEl.textContent = j.rowCount + '행 조회';
@@ -360,6 +362,15 @@
           });
           html += '</tbody></table>';
           resultEl.innerHTML = html;
+          if (rows.length > 0) {
+            window._lastSqlResult = { columns: cols, rows: rows };
+            csvBtn.disabled = false;
+            csvBtn.style.opacity = '1';
+          } else {
+            window._lastSqlResult = null;
+            csvBtn.disabled = true;
+            csvBtn.style.opacity = '0.4';
+          }
         } else {
           statusEl.style.color = '#1a7a1a';
           statusEl.textContent = '실행 완료 (' + j.affectedRows + '행 영향)';
@@ -369,11 +380,18 @@
             (j.changedRows != null ? ' | changedRows: ' + escHtml(String(j.changedRows)) : '') +
             (j.info ? ' | ' + escHtml(String(j.info)) : '') +
             '</div>';
+          window._lastSqlResult = null;
+          csvBtn.disabled = true;
+          csvBtn.style.opacity = '0.4';
         }
       })
       .catch(function(e) {
         statusEl.style.color = '#cc0000';
         statusEl.textContent = '오류: ' + e.message;
+        window._lastSqlResult = null;
+        var csvBtn = document.getElementById('csvBtn');
+        csvBtn.disabled = true;
+        csvBtn.style.opacity = '0.4';
       })
       .finally(function() {
         btn.disabled = false;
@@ -840,6 +858,43 @@
           btn.style.opacity = '1';
         });
     }, 2000);
+  }
+
+  function downloadCsv() {
+    var data = window._lastSqlResult;
+    if (!data || !data.rows || data.rows.length === 0) return;
+    var cols = data.columns;
+    var rows = data.rows;
+
+    function csvCell(v) {
+      if (v == null) return '';
+      var s = String(v);
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1 || s.indexOf('\r') !== -1) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    var lines = [];
+    lines.push(cols.map(csvCell).join(','));
+    rows.forEach(function(r) {
+      lines.push(cols.map(function(c) { return csvCell(r[c]); }).join(','));
+    });
+
+    var csv = '﻿' + lines.join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var now = new Date();
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    var fname = 'db_export_' +
+      now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + '_' +
+      pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds()) + '.csv';
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
   }
 
   function loadLowFw() {
