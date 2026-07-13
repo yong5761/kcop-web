@@ -38,6 +38,8 @@
 .lfw-kv td{padding:3px 8px;vertical-align:top;}
 .lfw-kv td:first-child{color:#4b637f;font-weight:600;white-space:nowrap;width:130px;}
 .lfw-sect{font-size:11px;font-weight:700;color:#888;padding:6px 10px 2px;letter-spacing:.5px;}
+.lfw-col-hdr{background:#eef1f5;cursor:default;font-weight:700;color:#4b637f;border-bottom:2px solid #c8d0db;}
+.lfw-col-hdr:hover{background:#eef1f5;}
 </style>
 </head>
 <body>
@@ -777,6 +779,15 @@
         if (rows.length === 0) { listEl.innerHTML = '<div style="color:#888;font-size:13px;padding:8px 0;">해당 단말 없음</div>'; return; }
         var wrap = document.createElement('div');
         wrap.style.cssText = 'border:1px solid #dfe3e8; border-radius:2px; overflow:hidden;';
+        var colHdr = document.createElement('div');
+        colHdr.className = 'lfw-row lfw-col-hdr';
+        colHdr.innerHTML =
+          '<span class="lfw-phone">전화번호</span>' +
+          '<span class="lfw-fw">펌웨어</span>' +
+          '<span class="lfw-name">비상벨명</span>' +
+          '<span class="lfw-region">지역</span>' +
+          '<span class="lfw-arrow"></span>';
+        wrap.appendChild(colHdr);
         rows.forEach(function(r, idx) {
           var hdr = document.createElement('div');
           hdr.className = 'lfw-row';
