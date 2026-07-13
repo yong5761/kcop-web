@@ -331,6 +331,25 @@ router.put('/api/bells/:phone', async (req, res) => {
   }
 });
 
+router.get('/api/bells/exists', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });
+  const phone = Number(req.query.phone);
+  if (!req.query.phone || isNaN(phone)) return res.status(400).json({ ok: false, error: 'phone 파라미터 필요' });
+  try {
+    const [rows] = await pool.execute(
+      'SELECT phone_no, machine_no, bell_name FROM bells WHERE phone_no = ?', [phone]
+    );
+    if (rows.length) {
+      res.json({ ok: true, exists: true, machine_no: rows[0].machine_no, bell_name: rows[0].bell_name });
+    } else {
+      res.json({ ok: true, exists: false });
+    }
+  } catch (e) {
+    console.error('[API] GET /api/bells/exists error:', e.message);
+    res.status(500).json({ ok: false, error: '서버 오류가 발생했습니다.' });
+  }
+});
+
 router.get('/api/bells/low-firmware', async (req, res) => {
   if (!req.session.user) return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });
   try {

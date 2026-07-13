@@ -397,12 +397,35 @@
       return;
     }
 
-    var topic = 'hk-multii/MB_' + gwNo + '/out';
-    var payload = { op: 100, pnum: devNo };
-    var payloadStr = JSON.stringify(payload);
-
     btn.disabled = true;
     btn.style.opacity = '0.6';
+    resultEl.style.color = '#888';
+    resultEl.textContent = '단말 확인 중...';
+
+    fetch('/api/bells/exists?phone=' + Number(devNo), { credentials: 'same-origin' })
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (!j.ok || !j.exists) {
+          resultEl.style.color = '#b87700';
+          resultEl.textContent = '등록되지 않은 단말입니다';
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          return;
+        }
+        devConnectPublish(devNo, gwNo, btn, resultEl);
+      })
+      .catch(function(e) {
+        resultEl.style.color = '#cc0000';
+        resultEl.textContent = '확인 오류: ' + e.message;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
+  }
+
+  function devConnectPublish(devNo, gwNo, btn, resultEl) {
+    var topic = 'hk-multii/MB_' + gwNo + '/out';
+    var payloadStr = JSON.stringify({ op: 100, pnum: devNo });
+
     resultEl.style.color = '#888';
     resultEl.textContent = '요청 중...';
 
