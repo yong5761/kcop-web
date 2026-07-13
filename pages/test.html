@@ -224,6 +224,7 @@
             <div style="margin-top:14px; display:flex; align-items:center; gap:10px;">
               <button id="genReadBtn" onclick="readGeneral();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">읽기</button>
               <button id="rmtSaveBtn" onclick="rmtSave();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">저장</button>
+              <span id="rmtSaveResult" style="font-size:12px; font-family:monospace;"></span>
               <span id="genResult" style="font-size:12px; font-family:monospace;"></span>
             </div>
           </div>
@@ -471,8 +472,16 @@
     var g = function(id) { return document.getElementById(id); };
     var s = function(id) { return g(id).value; };
     var numOr0 = function(v) { var n = Number(v); return isNaN(n) ? 0 : n; };
+    var resultEl = g('rmtSaveResult');
+    var btn = g('rmtSaveBtn');
 
     var devNo = s('devNo').trim();
+    if (!devNo) {
+      resultEl.style.color = '#cc0000';
+      resultEl.textContent = '대상 단말을 입력하세요';
+      return;
+    }
+
     var topic = 'hk-multii/MB_' + devNo + '/out';
     var payload = {
       op: 2,
@@ -493,8 +502,35 @@
       addsmsbellnum: g('tglSmsBell').checked ? 1 : 0
     };
 
-    g('mqtt-topic').value = topic;
-    g('mqtt-payload').value = JSON.stringify(payload);
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    resultEl.style.color = '#888';
+    resultEl.textContent = '발행 중...';
+
+    fetch('/api/mqtt/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ topic: topic, payload: JSON.stringify(payload) })
+    })
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (j.ok) {
+          resultEl.style.color = '#1a7a1a';
+          resultEl.textContent = '✅ 저장·발행 완료 (' + j.published_at + ')';
+        } else {
+          resultEl.style.color = '#cc0000';
+          resultEl.textContent = '발행 실패: ' + (j.error || '알 수 없는 오류');
+        }
+      })
+      .catch(function(e) {
+        resultEl.style.color = '#cc0000';
+        resultEl.textContent = '요청 오류: ' + e.message;
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
   }
 
   function rmtTab(name) {
