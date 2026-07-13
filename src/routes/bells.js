@@ -331,4 +331,24 @@ router.put('/api/bells/:phone', async (req, res) => {
   }
 });
 
+router.get('/api/bells/low-firmware', async (req, res) => {
+  if (!req.session.user) return res.status(401).json({ ok: false, error: '로그인이 필요합니다.' });
+  try {
+    const [rows] = await pool.execute(
+      `SELECT bl.phone_no, bl.fw_version, bl.last_seen, bl.voltage, bl.bellstatus,
+              bl.last_seq, bl.comm_state, bl.last_bellnumber,
+              b.machine_no, b.bell_name, b.region, b.address, b.lat, b.lng,
+              b.c1, b.c2, b.charge, b.bell_type, b.etc, b.created_at
+       FROM bell_latest bl
+       LEFT JOIN bells b ON bl.phone_no = b.phone_no
+       WHERE bl.fw_version < 90
+       ORDER BY bl.fw_version ASC, bl.phone_no ASC`
+    );
+    res.json({ ok: true, rows });
+  } catch (e) {
+    console.error('[API] GET /api/bells/low-firmware error:', e.message);
+    res.status(500).json({ ok: false, error: '서버 오류가 발생했습니다.' });
+  }
+});
+
 module.exports = router;
