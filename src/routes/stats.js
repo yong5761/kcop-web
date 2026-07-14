@@ -51,7 +51,7 @@ router.get('/api/stats/table', async (req, res) => {
        WHERE 1=1${whereExtra}
        GROUP BY b.phone_no, b.bell_name, b.region, b.address, b.machine_no,
                 b.bell_type, b.lat, b.lng, b.created_at
-       ORDER BY b.created_at DESC
+       ORDER BY (b.bell_name IS NULL), b.created_at DESC
        LIMIT ?, ?`,
       [...joinParams, ...whereParams, offset, PAGE_SIZE]
     );
