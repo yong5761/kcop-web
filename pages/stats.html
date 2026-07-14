@@ -76,33 +76,33 @@
       </div>
 
       <div style="width:99.9%; float:left; margin-top:10px;">
-        <table class="list" style="margin-bottom:0;">
-          <tr>
-            <th colspan="10">
-              <div id="search">
-                <form name="searchForm" onsubmit="doSearch(); return false;">
-                  지역:&nbsp;<select name="region" id="region-select" class="select01"><option value="">== 전체 ==</option></select>
-                  &nbsp;&nbsp;발생일:&nbsp;<input type="date" name="sdate" id="sdate" class="input01" />
-                  &nbsp;~&nbsp;<input type="date" name="edate" id="edate" class="input01" />
-                  &nbsp;&nbsp;<span style="line-height:20px;vertical-align:middle;" class="search_btn"><a href="#" onclick="doSearch();return false;">검색</a></span>
-                </form>
-              </div>
-            </th>
-          </tr>
-          <tr>
-            <th width="4%">NO</th>
-            <th width="5%">장비번호</th>
-            <th width="15%">비상벨명</th>
-            <th width="5%">지도</th>
-            <th width="10%">지역</th>
-            <th width="15%">설치주소</th>
-            <th width="10%">전화번호</th>
-            <th width="6%">비상벨구분</th>
-            <th width="10%">벨소리(총건수)</th>
-            <th width="10%">벨소리(미처리)</th>
-          </tr>
+        <div class="c">
+          <div id="search">
+            <form name="searchForm" onsubmit="doSearch(); return false;">
+              지역:&nbsp;<select name="region" id="region-select" class="select01"><option value="">== 전체 ==</option></select>
+              &nbsp;&nbsp;발생일:&nbsp;<input type="date" name="sdate" id="sdate" class="input01" />
+              &nbsp;~&nbsp;<input type="date" name="edate" id="edate" class="input01" />
+              &nbsp;&nbsp;<span style="line-height:20px;vertical-align:middle;" class="search_btn"><a href="#" onclick="doSearch();return false;">검색</a></span>
+            </form>
+          </div>
+        </div>
+        <table class="list" style="margin-bottom:20px;">
+          <thead>
+            <tr>
+              <th width="4%">NO</th>
+              <th width="5%">장비번호</th>
+              <th width="15%">비상벨명</th>
+              <th width="5%">지도</th>
+              <th width="10%">지역</th>
+              <th width="15%">설치주소</th>
+              <th width="10%">전화번호</th>
+              <th width="6%">비상벨구분</th>
+              <th width="10%">벨소리(총건수)</th>
+              <th width="10%">벨소리(미처리)</th>
+            </tr>
+          </thead>
           <tbody id="stats-tbody">
-            <tr><td colspan="10" style="text-align:center;">데이터를 불러오는 중...</td></tr>
+            <tr><td colspan="10">데이터를 불러오는 중...</td></tr>
           </tbody>
         </table>
         <div class="c" style="padding:6px 0;">
@@ -178,21 +178,21 @@
       .then(function(res) { return res.json(); })
       .then(function(j) {
         if (!j.ok) {
-          document.getElementById('stats-tbody').innerHTML = '<tr><td colspan="10" style="text-align:center;">데이터를 불러오지 못했습니다.</td></tr>';
+          document.getElementById('stats-tbody').innerHTML = '<tr><td colspan="10">데이터를 불러오지 못했습니다.</td></tr>';
           return;
         }
         renderTable(j.rows, j.total, j.page);
         renderPaging(j.total, j.page);
       })
       .catch(function() {
-        document.getElementById('stats-tbody').innerHTML = '<tr><td colspan="10" style="text-align:center;">데이터를 불러오지 못했습니다.</td></tr>';
+        document.getElementById('stats-tbody').innerHTML = '<tr><td colspan="10">데이터를 불러오지 못했습니다.</td></tr>';
       });
   }
 
   function renderTable(rows, total, page) {
     var tbody = document.getElementById('stats-tbody');
     if (!rows || rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">등록된 데이터가 없습니다.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10">등록된 데이터가 없습니다.</td></tr>';
       return;
     }
     var startNo = total - (page - 1) * PAGE_SIZE;
@@ -208,16 +208,16 @@
         ? '<span style="color:red;">' + unhandled + '</span>'
         : '0';
       html += '<tr>'
-        + '<td style="text-align:center;">' + no + '</td>'
-        + '<td style="text-align:center;">' + (r.machine_no != null ? r.machine_no : '-') + '</td>'
+        + '<td>' + no + '</td>'
+        + '<td>' + (r.machine_no != null ? r.machine_no : '-') + '</td>'
         + '<td>' + (r.bell_name  != null ? r.bell_name  : '-') + '</td>'
-        + '<td style="text-align:center;">' + mapBtn + '</td>'
-        + '<td style="text-align:center;">' + (r.region  != null ? r.region  : '-') + '</td>'
+        + '<td>' + mapBtn + '</td>'
+        + '<td>' + (r.region  != null ? r.region  : '-') + '</td>'
         + '<td>' + (r.address != null ? r.address : '-') + '</td>'
-        + '<td style="text-align:center;">' + formatPhone(r.phone_no) + '</td>'
-        + '<td style="text-align:center;">' + (r.bell_type || '비상벨') + '</td>'
-        + '<td style="text-align:center;">' + (Number(r.total_cnt) || 0) + '</td>'
-        + '<td style="text-align:center;">' + unhandledCell + '</td>'
+        + '<td>' + formatPhone(r.phone_no) + '</td>'
+        + '<td>' + (r.bell_type || '비상벨') + '</td>'
+        + '<td>' + (Number(r.total_cnt) || 0) + '</td>'
+        + '<td>' + unhandledCell + '</td>'
         + '</tr>';
     }
     tbody.innerHTML = html;
