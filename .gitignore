@@ -12,3 +12,5 @@ kcop_bells_master.csv
 *.bak
 data/sessions.sqlite
 data/sessions.sqlite.bak
+
+.claude/
