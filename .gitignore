@@ -1,2 +1,14 @@
 .env
 node_modules/
+backfill_events.js
+import_bells.js
+kcop_bells_master.csv
+*.bak
+data/sessions.sqlite
+data/sessions.sqlite.bak
+backfill_events.js
+import_bells.js
+kcop_bells_master.csv
+*.bak
+data/sessions.sqlite
+data/sessions.sqlite.bak
