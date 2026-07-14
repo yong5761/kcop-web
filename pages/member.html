@@ -180,7 +180,7 @@ fetch('/api/stats/summary')
       var u = document.getElementById('member-badge-unadjusted');
       var a = document.getElementById('member-badge-alarm');
       if(u) u.textContent = j.alarm_active;
-      if(a) a.textContent = j.alarm_active;
+      if(a) a.textContent = j.alarm_today;
     }
   }).catch(function(){});
 
