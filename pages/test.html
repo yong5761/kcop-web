@@ -225,7 +225,6 @@
               <button id="genReadBtn" onclick="readGeneral();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#6b7484; color:#fff; border:none; border-radius:3px; cursor:pointer;">읽기</button>
               <button id="rmtSaveBtn" onclick="rmtSave();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">저장</button>
               <span id="rmtSaveResult" style="font-size:12px; font-family:monospace;"></span>
-              <span id="genResult" style="font-size:12px; font-family:monospace;"></span>
             </div>
           </div>
           <div id="tabContentEs" style="display:none; background:#fff; padding:14px 18px;">
@@ -761,7 +760,7 @@
     var g = function(id) { return document.getElementById(id); };
     var devNo = g('devNo').value.trim();
     var btn = g('genReadBtn');
-    var resultEl = g('genResult');
+    var resultEl = g('rmtSaveResult');
     if (!devNo) {
       resultEl.style.color = '#cc0000';
       resultEl.textContent = '단말번호를 입력하세요';
