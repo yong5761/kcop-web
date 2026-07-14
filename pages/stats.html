@@ -10,6 +10,13 @@
 <link href="../common/css/common.css" type="text/css" rel="stylesheet" media="screen" />
 <script src="../common/js/jquery-1.7.1.min.js" language="JavaScript" type="text/javascript"></script>
 <script src="../common/js/kcop-auth.js"></script>
+<style>
+  #map-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:9999; }
+  #map-box { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:580px; background:#fff; border:2px solid #555; }
+  #map-titlebar { padding:7px 10px; background:#e8e8e8; font-weight:bold; font-size:13px; overflow:hidden; }
+  #map-container { width:100%; height:400px; }
+  input[type="date"].input01 { padding:2px 4px; font-size:12px; }
+</style>
 </head>
 <body>
 
@@ -68,13 +75,56 @@
         <p class="tt">경보발생</p>
       </div>
 
-      <iframe class="iframe01" src="" width="100%" height="600px" id="change_view"></iframe>
+      <div style="width:99.9%; float:left; margin-top:10px;">
+        <table class="list" style="margin-bottom:0;">
+          <tr>
+            <th colspan="10">
+              <div id="search">
+                <form name="searchForm" onsubmit="doSearch(); return false;">
+                  지역:&nbsp;<select name="region" id="region-select" class="select01"><option value="">== 전체 ==</option></select>
+                  &nbsp;&nbsp;발생일:&nbsp;<input type="date" name="sdate" id="sdate" class="input01" />
+                  &nbsp;~&nbsp;<input type="date" name="edate" id="edate" class="input01" />
+                  &nbsp;&nbsp;<span style="line-height:20px;vertical-align:middle;" class="search_btn"><a href="#" onclick="doSearch();return false;">검색</a></span>
+                </form>
+              </div>
+            </th>
+          </tr>
+          <tr>
+            <th width="4%">NO</th>
+            <th width="5%">장비번호</th>
+            <th width="15%">비상벨명</th>
+            <th width="5%">지도</th>
+            <th width="10%">지역</th>
+            <th width="15%">설치주소</th>
+            <th width="10%">전화번호</th>
+            <th width="6%">비상벨구분</th>
+            <th width="10%">벨소리(총건수)</th>
+            <th width="10%">벨소리(미처리)</th>
+          </tr>
+          <tbody id="stats-tbody">
+            <tr><td colspan="10" style="text-align:center;">데이터를 불러오는 중...</td></tr>
+          </tbody>
+        </table>
+        <div class="c" style="padding:6px 0;">
+          <div id="stats-paging"></div>
+        </div>
+      </div>
 
     </div>
   </div>
 
   <div class="footer"><img src="../common/img/common/copy.png" alt="" /></div>
+</div>
 
+<!-- Map overlay -->
+<div id="map-overlay" onclick="closeMap(event);">
+  <div id="map-box" onclick="event.stopPropagation();">
+    <div id="map-titlebar">
+      <span id="map-title">지도</span>
+      <span style="float:right;"><a href="#" onclick="closeMap();return false;" style="color:#333;font-weight:bold;text-decoration:none;">✕ 닫기</a></span>
+    </div>
+    <div id="map-container"></div>
+  </div>
 </div>
 
 <script type="text/javascript">
@@ -89,17 +139,194 @@
     }
   })();
 
-  fetch('/api/stats/summary')
-    .then(function(res) { return res.json(); })
-    .then(function(j) {
-      if (j.ok) {
+  var currentPage = 1;
+  var currentRegion = '';
+  var currentSdate = '';
+  var currentEdate = '';
+  var PAGE_SIZE = 10;
+
+  function formatPhone(phone_no) {
+    var s = '0' + String(phone_no);
+    while (s.length < 11) s = '0' + s;
+    return s.slice(0, 3) + '-' + s.slice(3, 7) + '-' + s.slice(7, 11);
+  }
+
+  function loadRegions() {
+    fetch('/api/stats/regions')
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (!j.ok) return;
+        var sel = document.getElementById('region-select');
+        j.regions.forEach(function(r) {
+          var opt = document.createElement('option');
+          opt.value = r;
+          opt.textContent = r;
+          sel.appendChild(opt);
+        });
+      })
+      .catch(function() {});
+  }
+
+  function loadTable(page) {
+    currentPage = page || 1;
+    var url = '/api/stats/table?page=' + currentPage;
+    if (currentRegion) url += '&region=' + encodeURIComponent(currentRegion);
+    if (currentSdate)  url += '&sdate='  + encodeURIComponent(currentSdate);
+    if (currentEdate)  url += '&edate='  + encodeURIComponent(currentEdate);
+
+    fetch(url)
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (!j.ok) {
+          document.getElementById('stats-tbody').innerHTML = '<tr><td colspan="10" style="text-align:center;">데이터를 불러오지 못했습니다.</td></tr>';
+          return;
+        }
+        renderTable(j.rows, j.total, j.page);
+        renderPaging(j.total, j.page);
+      })
+      .catch(function() {
+        document.getElementById('stats-tbody').innerHTML = '<tr><td colspan="10" style="text-align:center;">데이터를 불러오지 못했습니다.</td></tr>';
+      });
+  }
+
+  function renderTable(rows, total, page) {
+    var tbody = document.getElementById('stats-tbody');
+    if (!rows || rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">등록된 데이터가 없습니다.</td></tr>';
+      return;
+    }
+    var startNo = total - (page - 1) * PAGE_SIZE;
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var no = startNo - i;
+      var mapBtn = (r.lat != null && r.lng != null)
+        ? '<span class="link_btn_bg_s"><a href="#" onclick="openMap(' + r.lat + ',' + r.lng + ',' + JSON.stringify(r.bell_name || '') + ');return false;">보기</a></span>'
+        : '-';
+      var unhandled = Number(r.unhandled_cnt) || 0;
+      var unhandledCell = unhandled > 0
+        ? '<span style="color:red;">' + unhandled + '</span>'
+        : '0';
+      html += '<tr>'
+        + '<td style="text-align:center;">' + no + '</td>'
+        + '<td style="text-align:center;">' + (r.machine_no != null ? r.machine_no : '-') + '</td>'
+        + '<td>' + (r.bell_name  != null ? r.bell_name  : '-') + '</td>'
+        + '<td style="text-align:center;">' + mapBtn + '</td>'
+        + '<td style="text-align:center;">' + (r.region  != null ? r.region  : '-') + '</td>'
+        + '<td>' + (r.address != null ? r.address : '-') + '</td>'
+        + '<td style="text-align:center;">' + formatPhone(r.phone_no) + '</td>'
+        + '<td style="text-align:center;">' + (r.bell_type || '비상벨') + '</td>'
+        + '<td style="text-align:center;">' + (Number(r.total_cnt) || 0) + '</td>'
+        + '<td style="text-align:center;">' + unhandledCell + '</td>'
+        + '</tr>';
+    }
+    tbody.innerHTML = html;
+  }
+
+  function renderPaging(total, page) {
+    var el = document.getElementById('stats-paging');
+    if (!el) return;
+    var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    var BLOCK = 10;
+    var blockStart = Math.floor((page - 1) / BLOCK) * BLOCK + 1;
+    var blockEnd   = Math.min(blockStart + BLOCK - 1, totalPages);
+    var html = '';
+    html += '<a href="#" onclick="goPage(1);return false;"><img src="../common/img/common/paging_first.gif" alt="처음" /></a>';
+    html += '<a href="#" onclick="goPage(' + Math.max(1, page - 1) + ');return false;"><img src="../common/img/common/paging_prev.gif" alt="이전" /></a>';
+    for (var p = blockStart; p <= blockEnd; p++) {
+      if (p === page) {
+        html += '<span class="num_ov"><a href="#" onclick="goPage(' + p + ');return false;" style="text-decoration:none;">' + p + '</a></span> ';
+      } else {
+        html += '<span class="num"><a href="#" onclick="goPage(' + p + ');return false;" style="text-decoration:none;"><strong style="font-size:12px;margin:0px 0px 0 0;color:#000000;">' + p + '</strong></a></span> ';
+      }
+    }
+    html += '<a href="#" onclick="goPage(' + Math.min(totalPages, page + 1) + ');return false;"><img src="../common/img/common/paging_next.gif" alt="다음" /></a>';
+    html += '<a href="#" onclick="goPage(' + totalPages + ');return false;"><img src="../common/img/common/paging_end.gif" alt="마지막" /></a>';
+    el.innerHTML = html;
+  }
+
+  function goPage(p) {
+    loadTable(p);
+  }
+
+  function doSearch() {
+    currentRegion = document.getElementById('region-select').value;
+    currentSdate  = document.getElementById('sdate').value;
+    currentEdate  = document.getElementById('edate').value;
+    loadTable(1);
+  }
+
+  // Map popup
+  var kakaoReady = false;
+  var pendingLat = null;
+  var pendingLng = null;
+  var pendingName = '';
+
+  function openMap(lat, lng, name) {
+    pendingLat  = lat;
+    pendingLng  = lng;
+    pendingName = name || '';
+    document.getElementById('map-title').textContent = name || '지도';
+    document.getElementById('map-overlay').style.display = 'block';
+    document.getElementById('map-container').innerHTML = '';
+
+    if (!kakaoReady) {
+      if (typeof kakao === 'undefined') {
+        var s = document.createElement('script');
+        s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=4f8113e9d33b19b56daeda4b73e65b78&autoload=false';
+        s.onload = function() {
+          kakao.maps.load(function() {
+            kakaoReady = true;
+            renderKakaoMap(pendingLat, pendingLng, pendingName);
+          });
+        };
+        document.head.appendChild(s);
+      } else {
+        kakao.maps.load(function() {
+          kakaoReady = true;
+          renderKakaoMap(pendingLat, pendingLng, pendingName);
+        });
+      }
+    } else {
+      renderKakaoMap(lat, lng, name);
+    }
+  }
+
+  function renderKakaoMap(lat, lng, name) {
+    var container = document.getElementById('map-container');
+    var options = { center: new kakao.maps.LatLng(lat, lng), level: 4 };
+    var map = new kakao.maps.Map(container, options);
+    var marker = new kakao.maps.Marker({ map: map, position: new kakao.maps.LatLng(lat, lng) });
+    if (name) {
+      var iw = new kakao.maps.InfoWindow({
+        content: '<div style="padding:5px 10px;font-size:12px;white-space:nowrap;">' + name + '</div>'
+      });
+      iw.open(map, marker);
+    }
+  }
+
+  function closeMap(e) {
+    if (e && e.target && e.target.id !== 'map-overlay') return;
+    document.getElementById('map-overlay').style.display = 'none';
+  }
+
+  // Widget badges
+  function loadBadges() {
+    fetch('/api/stats/summary')
+      .then(function(res) { return res.json(); })
+      .then(function(j) {
+        if (!j.ok) return;
         var unadj = document.getElementById('stats-badge-unadjusted');
         var alarm = document.getElementById('stats-badge-alarm');
-        if (unadj) unadj.textContent = j.alarm_active;
-        if (alarm) alarm.textContent = j.alarm_active;
-      }
-    })
-    .catch(function() {});
+        if (unadj) unadj.textContent = j.alarm_active;  // 미조치건
+        if (alarm) alarm.textContent = j.alarm_today;   // 경보발생(오늘)
+      })
+      .catch(function() {});
+  }
+
+  loadRegions();
+  loadTable(1);
+  loadBadges();
   loadTopbarUser();
 </script>
 
