@@ -235,7 +235,7 @@
       </div>
 
 
-      <div style="width:99.9%; float:left; background-color:#fff; margin-top:20px; padding:20px 24px; box-sizing:border-box;">
+      <div id="dbConsoleSection" style="width:99.9%; float:left; background-color:#fff; margin-top:20px; padding:20px 24px; box-sizing:border-box;">
         <div style="width:100%; border:1px solid #dfe3e8; border-radius:2px; overflow:hidden;">
           <div style="background:#4b637f; color:#fff; font-size:14px; font-weight:600; padding:9px 14px;"></div>
           <div style="padding:14px 18px;">
@@ -900,6 +900,19 @@
       }
     })
     .catch(function() {});
+
+  fetch('/api/db/status')
+    .then(function(r) { return r.json(); })
+    .then(function(j) {
+      if (!j.enabled) {
+        var sec = document.getElementById('dbConsoleSection');
+        if (sec) sec.style.display = 'none';
+      }
+    })
+    .catch(function() {
+      var sec = document.getElementById('dbConsoleSection');
+      if (sec) sec.style.display = 'none';
+    });
 </script>
 
 </body>

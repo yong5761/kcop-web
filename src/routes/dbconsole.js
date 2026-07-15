@@ -5,7 +5,15 @@ const pool = require('../db');
 
 const router = Router();
 
+const isEnabled = () => process.env.ENABLE_DB_CONSOLE === 'true';
+
+router.get('/api/db/status', (req, res) => {
+  res.json({ ok: true, enabled: isEnabled() });
+});
+
 router.post('/api/db/query', async (req, res) => {
+  if (!isEnabled()) return res.status(404).json({ ok: false });
+
   const sql = ((req.body && req.body.sql) || '').trim();
   if (!sql) return res.json({ ok: false, error: 'SQL을 입력하세요' });
 
@@ -13,7 +21,6 @@ router.post('/api/db/query', async (req, res) => {
   try {
     conn = await pool.getConnection();
 
-    // 1단계: 문법 확인 (prepare — 실행 없이 파싱만)
     try {
       const stmt = await conn.prepare(sql);
       await stmt.close();
@@ -22,7 +29,6 @@ router.post('/api/db/query', async (req, res) => {
       return res.json({ ok: false, phase: 'syntax', error: synErr.message });
     }
 
-    // 2단계: 실제 실행
     const [result, fields] = await conn.query(sql);
     conn.release();
 
