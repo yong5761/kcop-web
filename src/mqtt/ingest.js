@@ -7,6 +7,7 @@ const { parseBellData, topicToPhone } = require('./parseBellData');
 const connMap = new Map();
 const esMap = new Map();
 const genMap = new Map();
+const saveMap = new Map();
 
 function startIngest() {
   const client = mqtt.connect(process.env.MQTT_URL);
@@ -41,8 +42,17 @@ function startIngest() {
           console.log('[MQTT] /in op:7 이지사운드: pnum=%s', pnum);
         }
         if (data && data.op === 11) {
-          genMap.set(pnum, { payload: data, at: Date.now() });
-          console.log('[MQTT] /in op:11 일반설정: pnum=%s', pnum);
+          let fw_version = null;
+          try {
+            const [fwRows] = await pool.execute('SELECT fw_version FROM bell_latest WHERE phone_no = ?', [pnum]);
+            if (fwRows.length > 0) fw_version = fwRows[0].fw_version;
+          } catch (e) {}
+          genMap.set(pnum, { payload: data, fw_version, at: Date.now() });
+          console.log('[MQTT] /in op:11 일반설정: pnum=%s payload=%s', pnum, JSON.stringify(data));
+        }
+        if (data && data.op === 12) {
+          saveMap.set(pnum, { at: Date.now() });
+          console.log('[MQTT] /in op:12 저장응답: pnum=%s', pnum);
         }
       }
       return;
@@ -173,3 +183,4 @@ module.exports = startIngest;
 module.exports.getConnAt = (pnum) => connMap.get(String(pnum));
 module.exports.getEasysound = (pnum) => esMap.get(String(pnum));
 module.exports.getGeneral = (pnum) => genMap.get(String(pnum));
+module.exports.getSave = (pnum) => saveMap.get(String(pnum));
