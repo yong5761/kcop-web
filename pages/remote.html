@@ -463,7 +463,7 @@
         // 발행 성공 → 응답 대기 폴링 시작
         resultEl.style.color = '#888';
         resultEl.textContent = '응답 대기중...';
-        startConnPoll(devNo, btn, resultEl);
+        startConnPoll(devNo, new Date(j.published_at).getTime(), btn, resultEl);
       })
       .catch(function(e) {
         resultEl.style.color = '#cc0000';
@@ -473,12 +473,12 @@
       });
   }
 
-  function startConnPoll(devNo, btn, resultEl) {
+  function startConnPoll(devNo, after, btn, resultEl) {
     var maxTries = 8;
     var tries = 0;
     var timer = setInterval(function() {
       tries++;
-      fetch('/api/mqtt/connection-status?devNo=' + encodeURIComponent(devNo), {
+      fetch('/api/mqtt/connection-status?devNo=' + encodeURIComponent(devNo) + '&after=' + after, {
         credentials: 'same-origin'
       })
         .then(function(res) { return res.json(); })
@@ -563,7 +563,7 @@
         }
         resultEl.style.color = '#888';
         resultEl.textContent = '응답 대기중...';
-        startSavePoll(devNo, btn, resultEl);
+        startSavePoll(devNo, new Date(j.published_at).getTime(), btn, resultEl);
       })
       .catch(function(e) {
         resultEl.style.color = '#cc0000';
@@ -618,7 +618,7 @@
         }
         resultEl.style.color = '#888';
         resultEl.textContent = '응답 대기중...';
-        startEsPoll(devNo, btn, resultEl);
+        startEsPoll(devNo, new Date(j.published_at).getTime(), btn, resultEl);
       })
       .catch(function(e) {
         resultEl.style.color = '#cc0000';
@@ -628,12 +628,12 @@
       });
   }
 
-  function startEsPoll(devNo, btn, resultEl) {
+  function startEsPoll(devNo, after, btn, resultEl) {
     var maxTries = 8;
     var tries = 0;
     var timer = setInterval(function() {
       tries++;
-      fetch('/api/mqtt/easysound-status?devNo=' + encodeURIComponent(devNo), {
+      fetch('/api/mqtt/easysound-status?devNo=' + encodeURIComponent(devNo) + '&after=' + after, {
         credentials: 'same-origin'
       })
         .then(function(res) { return res.json(); })
@@ -768,7 +768,7 @@
         }
         resultEl.style.color = '#888';
         resultEl.textContent = '응답 대기중...';
-        startGenPoll(devNo, btn, resultEl);
+        startGenPoll(devNo, new Date(j.published_at).getTime(), btn, resultEl);
       })
       .catch(function(e) {
         resultEl.style.color = '#cc0000';
@@ -778,13 +778,13 @@
       });
   }
 
-  function startGenPoll(devNo, btn, resultEl) {
+  function startGenPoll(devNo, after, btn, resultEl) {
     var maxTries = 8;
     var tries = 0;
     var g = function(id) { return document.getElementById(id); };
     var timer = setInterval(function() {
       tries++;
-      fetch('/api/mqtt/general-status?devNo=' + encodeURIComponent(devNo), {
+      fetch('/api/mqtt/general-status?devNo=' + encodeURIComponent(devNo) + '&after=' + after, {
         credentials: 'same-origin'
       })
         .then(function(res) { return res.json(); })
@@ -838,12 +838,12 @@
     }, 2000);
   }
 
-  function startSavePoll(devNo, btn, resultEl) {
+  function startSavePoll(devNo, after, btn, resultEl) {
     var maxTries = 8;
     var tries = 0;
     var timer = setInterval(function() {
       tries++;
-      fetch('/api/mqtt/save-status?devNo=' + encodeURIComponent(devNo), {
+      fetch('/api/mqtt/save-status?devNo=' + encodeURIComponent(devNo) + '&after=' + after, {
         credentials: 'same-origin'
       })
         .then(function(res) { return res.json(); })
