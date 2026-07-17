@@ -42,12 +42,9 @@ function startIngest() {
           console.log('[MQTT] /in op:7 이지사운드: pnum=%s', pnum);
         }
         if (data && data.op === 11) {
-          let fw_version = null;
-          try {
-            const [fwRows] = await pool.execute('SELECT fw_version FROM bell_latest WHERE phone_no = ?', [pnum]);
-            if (fwRows.length > 0) fw_version = fwRows[0].fw_version;
-          } catch (e) {}
+          const fw_version = data.ver != null ? data.ver : null;
           genMap.set(pnum, { payload: data, fw_version, at: Date.now() });
+          saveMap.set(pnum, { at: Date.now() });
           console.log('[MQTT] /in op:11 일반설정: pnum=%s payload=%s', pnum, JSON.stringify(data));
         }
         if (data && data.op === 12) {
