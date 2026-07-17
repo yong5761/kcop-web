@@ -213,6 +213,10 @@
               <button id="rmtSaveBtn" onclick="rmtSave();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#4b637f; color:#fff; border:none; border-radius:3px; cursor:pointer;">저장</button>
               <span id="rmtSaveResult" style="font-size:12px; font-family:monospace;"></span>
             </div>
+            <div id="smsDownloadRow" style="margin-top:10px; display:none; align-items:center; gap:10px;">
+              <button id="smsDownloadBtn" onclick="downloadSmsTrigger();" style="padding:7px 24px; font-size:13px; font-weight:600; background:#5a6e5a; color:#fff; border:none; border-radius:3px; cursor:pointer;">SMSTrigger.exe 다운로드</button>
+              <span id="smsFileInfo" style="font-size:12px; font-family:monospace; color:#555;"></span>
+            </div>
           </div>
           <div id="tabContentEs" style="display:none; background:#fff; padding:14px 18px;">
             <table class="rmt-form-table" style="border-collapse:collapse; font-size:13px; color:#333;">
@@ -953,6 +957,31 @@
       var sec = document.getElementById('dbConsoleSection');
       if (sec) sec.style.display = 'none';
     });
+
+  function downloadSmsTrigger() {
+    window.location.href = '/api/download/smstrigger';
+  }
+
+  fetch('/api/download/smstrigger/info', { credentials: 'same-origin' })
+    .then(function(r) { return r.json(); })
+    .then(function(j) {
+      if (!j.ok) return;
+      var row = document.getElementById('smsDownloadRow');
+      var info = document.getElementById('smsFileInfo');
+      if (row) row.style.display = 'flex';
+      if (info) {
+        var mtime = new Date(j.mtime);
+        var kst = new Date(mtime.getTime() + 9 * 60 * 60 * 1000);
+        var pad = function(n) { return String(n).padStart(2, '0'); };
+        var dateStr = kst.getUTCFullYear() + '-' + pad(kst.getUTCMonth() + 1) + '-' + pad(kst.getUTCDate())
+          + ' ' + pad(kst.getUTCHours()) + ':' + pad(kst.getUTCMinutes());
+        var sizeStr = j.size >= 1048576
+          ? (j.size / 1048576).toFixed(1) + ' MB'
+          : (j.size >= 1024 ? (j.size / 1024).toFixed(1) + ' KB' : j.size + ' B');
+        info.textContent = dateStr + ' · ' + sizeStr;
+      }
+    })
+    .catch(function() {});
 </script>
 
 </body>

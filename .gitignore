@@ -14,3 +14,4 @@ data/sessions.sqlite
 data/sessions.sqlite.bak
 
 .claude/
+/data/downloads/
