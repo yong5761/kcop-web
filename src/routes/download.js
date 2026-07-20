@@ -31,7 +31,15 @@ router.get('/api/download/smstrigger', (req, res) => {
     res.setHeader('Content-Length', stat.size);
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
-    fs.createReadStream(SMSTRIGGER_PATH).pipe(res);
+    const stream = fs.createReadStream(SMSTRIGGER_PATH);
+    stream.on('error', (streamErr) => {
+      if (!res.headersSent) {
+        res.status(500).json({ ok: false, error: '다운로드 오류' });
+      } else {
+        res.destroy();
+      }
+    });
+    stream.pipe(res);
   });
 });
 

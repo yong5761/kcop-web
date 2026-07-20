@@ -32,9 +32,12 @@ router.post('/api/mqtt/publish', (req, res) => {
 
 router.get('/api/mqtt/connection-status', (req, res) => {
   const devNo = String(req.query.devNo || '').trim();
-  const after = Number(req.query.after) || 0;
+  const after = Number(req.query.after);
   if (!devNo) {
     return res.status(400).json({ ok: false, error: 'devNo 파라미터 필요' });
+  }
+  if (!req.query.after || isNaN(after)) {
+    return res.status(400).json({ ok: false, error: 'after 파라미터 필요' });
   }
   const at = ingest.getConnAt(devNo);
   if (at && at > after && (Date.now() - at) <= 30000) {
@@ -45,8 +48,9 @@ router.get('/api/mqtt/connection-status', (req, res) => {
 
 router.get('/api/mqtt/general-status', (req, res) => {
   const devNo = String(req.query.devNo || '').trim();
-  const after = Number(req.query.after) || 0;
+  const after = Number(req.query.after);
   if (!devNo) return res.status(400).json({ ok: false, error: 'devNo 파라미터 필요' });
+  if (!req.query.after || isNaN(after)) return res.status(400).json({ ok: false, error: 'after 파라미터 필요' });
   const data = ingest.getGeneral(devNo);
   if (data && data.at > after && (Date.now() - data.at) <= 30000) {
     return res.json({ ok: true, received: true, payload: data.payload, fw_version: data.fw_version, at: new Date(data.at).toISOString() });
@@ -56,8 +60,9 @@ router.get('/api/mqtt/general-status', (req, res) => {
 
 router.get('/api/mqtt/easysound-status', (req, res) => {
   const devNo = String(req.query.devNo || '').trim();
-  const after = Number(req.query.after) || 0;
+  const after = Number(req.query.after);
   if (!devNo) return res.status(400).json({ ok: false, error: 'devNo 파라미터 필요' });
+  if (!req.query.after || isNaN(after)) return res.status(400).json({ ok: false, error: 'after 파라미터 필요' });
   const data = ingest.getEasysound(devNo);
   if (data && data.at > after && (Date.now() - data.at) <= 30000) {
     return res.json({
@@ -72,8 +77,9 @@ router.get('/api/mqtt/easysound-status', (req, res) => {
 
 router.get('/api/mqtt/save-status', (req, res) => {
   const devNo = String(req.query.devNo || '').trim();
-  const after = Number(req.query.after) || 0;
+  const after = Number(req.query.after);
   if (!devNo) return res.status(400).json({ ok: false, error: 'devNo 파라미터 필요' });
+  if (!req.query.after || isNaN(after)) return res.status(400).json({ ok: false, error: 'after 파라미터 필요' });
   const data = ingest.getSave(devNo);
   if (data && data.at > after && (Date.now() - data.at) <= 30000) {
     return res.json({ ok: true, received: true, at: new Date(data.at).toISOString() });
