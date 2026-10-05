@@ -2,10 +2,11 @@
   'use strict';
 
   var STORAGE_KEY = 'kcop_fault_alerted';
-  var POLL_MS = 30000;
+  var POLL_MS     = 30000;
+  var MAX_CARDS   = 15;
 
   var baselineDone = false;
-  var shownRows = []; // rows currently displayed in the modal
+  var openCards    = []; // DOM elements of currently visible cards
 
   // ── CSS injection (runs once) ─────────────────────────────────────────────
   var styleEl = document.createElement('style');
@@ -14,42 +15,21 @@
     '#kcop-fault-overlay.show{display:block}\n' +
     '#kcop-fault-overlay .kfo-edge{position:absolute;inset:0;box-shadow:inset 0 0 0 6px rgba(26,107,181,.9);animation:kcopFaultPulse 1s ease-in-out infinite}\n' +
     '@keyframes kcopFaultPulse{0%,100%{box-shadow:inset 0 0 0 6px rgba(26,107,181,.25)}50%{box-shadow:inset 0 0 0 10px rgba(26,107,181,.95)}}\n' +
-    '#kcop-fault-modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);width:min(420px,92vw);overflow:hidden}\n' +
-    '#kcop-fault-modal.show{display:block}\n' +
-    '#kcop-fault-modal .kfm-head{background:#1a6bb5;color:#fff;padding:18px 20px;text-align:center}\n' +
-    '#kcop-fault-modal .kfm-ico{font-size:34px;line-height:1}\n' +
-    '#kcop-fault-modal .kfm-title{font-size:1.15rem;font-weight:800;margin-top:6px}\n' +
-    '#kcop-fault-modal .kfm-sub{font-size:.8rem;opacity:.9;margin-top:2px}\n' +
-    '#kcop-fault-modal .kfm-list{max-height:300px;overflow-y:auto;padding:8px}\n' +
-    '#kcop-fault-modal .kfm-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #dbeafe;background:#eff6ff;border-radius:10px;margin:6px 4px}\n' +
-    '#kcop-fault-modal .kfm-dot{width:10px;height:10px;border-radius:50%;background:#1a6bb5;flex-shrink:0;animation:kcopFaultDot 1s infinite}\n' +
-    '@keyframes kcopFaultDot{0%,100%{opacity:.4}50%{opacity:1}}\n' +
-    '#kcop-fault-modal .kfm-info{flex:1;min-width:0}\n' +
-    '#kcop-fault-modal .kfm-dev{font-weight:700;font-size:.9rem;color:#111827}\n' +
-    '#kcop-fault-modal .kfm-meta{font-size:.8rem;color:#6b7280;margin-top:2px}\n' +
-    '#kcop-fault-modal .kfm-foot{padding:10px 14px;border-top:1px solid #f1f5f9;text-align:center}\n' +
-    '#kcop-fault-modal .kfm-dismiss{background:#e5e7eb;border:none;border-radius:8px;padding:8px 18px;font-size:.84rem;color:#374151;cursor:pointer}';
+    '.kcop-fault-card{position:fixed;top:50%;left:50%;z-index:10001;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);width:min(380px,92vw);overflow:hidden}\n' +
+    '.kcop-fault-card .kfc-head{background:#1a6bb5;color:#fff;padding:16px 18px;text-align:center}\n' +
+    '.kcop-fault-card .kfc-ico{font-size:30px;line-height:1}\n' +
+    '.kcop-fault-card .kfc-title{font-size:1.1rem;font-weight:800;margin-top:4px}\n' +
+    '.kcop-fault-card .kfc-body{padding:14px 18px;font-size:.88rem;line-height:1.9;color:#222}\n' +
+    '.kcop-fault-card .kfc-body b{color:#1a6bb5}\n' +
+    '.kcop-fault-card .kfc-foot{padding:10px 14px;border-top:1px solid #f1f5f9;text-align:center}\n' +
+    '.kcop-fault-card .kfc-close{background:#e5e7eb;border:none;border-radius:8px;padding:8px 18px;font-size:.84rem;color:#374151;cursor:pointer}';
   document.head.appendChild(styleEl);
 
-  // ── DOM injection (runs once) ─────────────────────────────────────────────
+  // ── Overlay DOM (runs once) ───────────────────────────────────────────────
   var overlayEl = document.createElement('div');
   overlayEl.id = 'kcop-fault-overlay';
   overlayEl.innerHTML = '<div class="kfo-edge"></div>';
   document.body.appendChild(overlayEl);
-
-  var modalEl = document.createElement('div');
-  modalEl.id = 'kcop-fault-modal';
-  modalEl.innerHTML =
-    '<div class="kfm-head">' +
-      '<div class="kfm-ico">⚠</div>' +
-      '<div class="kfm-title">장애발생</div>' +
-      '<div class="kfm-sub" id="kcop-fault-sub">통신장애 발생</div>' +
-    '</div>' +
-    '<div class="kfm-list" id="kcop-fault-list"></div>' +
-    '<div class="kfm-foot"><button class="kfm-dismiss" id="kcop-fault-dismiss">닫기</button></div>';
-  document.body.appendChild(modalEl);
-
-  document.getElementById('kcop-fault-dismiss').addEventListener('click', dismissModal);
 
   // ── Helpers ───────────────────────────────────────────────────────────────
   function esc(val) {
@@ -86,49 +66,61 @@
     } catch (e) {}
   }
 
-  // ── Modal ─────────────────────────────────────────────────────────────────
-  function renderList() {
-    var listEl = document.getElementById('kcop-fault-list');
-    var subEl  = document.getElementById('kcop-fault-sub');
-    if (!listEl || !subEl) return;
-
-    subEl.textContent = '통신장애 ' + shownRows.length + '대';
-
-    var html = '';
-    shownRows.forEach(function (r) {
-      var devText = (r.region || r.bell_name)
-        ? (r.region ? esc(r.region) + ' ' : '') + esc(r.bell_name || '')
-        : esc(String(r.phone_no || '-'));
-      var metaText = esc(String(r.phone_no || '')) +
-                     ' · 최종통신 ' +
-                     esc(formatLastSeen(r.last_seen));
-      html +=
-        '<div class="kfm-item">' +
-          '<div class="kfm-dot"></div>' +
-          '<div class="kfm-info">' +
-            '<div class="kfm-dev">' + devText + '</div>' +
-            '<div class="kfm-meta">' + metaText + '</div>' +
-          '</div>' +
-        '</div>';
-    });
-    listEl.innerHTML = html;
+  // ── Card stack ────────────────────────────────────────────────────────────
+  function restack() {
+    for (var i = 0; i < openCards.length; i++) {
+      openCards[i].style.transform =
+        'translate(calc(-50% + ' + (i * 24) + 'px), calc(-50% + ' + (i * 24) + 'px))';
+      openCards[i].style.zIndex = 10001 + i;
+    }
   }
 
-  function showModal(newRows) {
-    var existSet = {};
-    shownRows.forEach(function (r) { existSet[String(r.phone_no)] = true; });
-    newRows.forEach(function (r) {
-      if (!existSet[String(r.phone_no)]) shownRows.push(r);
-    });
-    renderList();
+  function makeCloseHandler(cardEl) {
+    return function () {
+      if (cardEl.parentNode) cardEl.parentNode.removeChild(cardEl);
+      var idx = openCards.indexOf(cardEl);
+      if (idx !== -1) openCards.splice(idx, 1);
+      restack();
+      if (openCards.length === 0) overlayEl.classList.remove('show');
+    };
+  }
+
+  function buildCard(headHtml, bodyHtml) {
+    var el = document.createElement('div');
+    el.className = 'kcop-fault-card';
+    el.innerHTML =
+      '<div class="kfc-head">' +
+        '<div class="kfc-ico">⚠</div>' +
+        '<div class="kfc-title">' + headHtml + '</div>' +
+      '</div>' +
+      '<div class="kfc-body">' + bodyHtml + '</div>' +
+      '<div class="kfc-foot"><button class="kfc-close">닫기</button></div>';
+    el.querySelector('.kfc-close').addEventListener('click', makeCloseHandler(el));
+    return el;
+  }
+
+  function addCard(row) {
+    var bellName = (row.region || row.bell_name) ? esc(row.bell_name || '') : esc(String(row.phone_no || '-'));
+    var body =
+      (row.region  ? '<b>지역:</b> '    + esc(row.region)  + '<br>' : '') +
+      '<b>비상벨:</b> ' + bellName + '<br>' +
+      (row.address ? '<b>주소:</b> '    + esc(row.address) + '<br>' : '') +
+      '<b>전화번호:</b> ' + esc(String(row.phone_no || '-')) + '<br>' +
+      '<b>최종통신:</b> ' + esc(formatLastSeen(row.last_seen));
+    var card = buildCard('장애발생', body);
+    document.body.appendChild(card);
+    openCards.push(card);
+    restack();
     overlayEl.classList.add('show');
-    modalEl.classList.add('show');
   }
 
-  function dismissModal() {
-    overlayEl.classList.remove('show');
-    modalEl.classList.remove('show');
-    shownRows = [];
+  function addSummaryCard(n) {
+    var body = '<b>외 ' + n + '건 통신장애</b>가 추가로 발생했습니다.';
+    var card = buildCard('장애발생', body);
+    document.body.appendChild(card);
+    openCards.push(card);
+    restack();
+    overlayEl.classList.add('show');
   }
 
   // ── Core poll logic ───────────────────────────────────────────────────────
@@ -146,7 +138,7 @@
         var alerted = loadAlerted();
 
         if (!baselineDone) {
-          // First poll: establish baseline silently — no modal
+          // First poll: establish baseline silently — no cards
           baselineDone = true;
           saveAlerted(currentPhones);
           return;
@@ -160,12 +152,17 @@
         });
 
         // Keep only currently faulted phones; resolved ones drop out so
-        // they can re-trigger the modal if the fault recurs.
+        // they can re-trigger cards if the fault recurs.
         saveAlerted(currentPhones);
 
         if (newlyFaulted.length === 0) return;
 
-        showModal(newlyFaulted);
+        var room     = Math.max(0, MAX_CARDS - openCards.length);
+        var toShow   = newlyFaulted.slice(0, room);
+        var overflow = newlyFaulted.length - toShow.length;
+
+        toShow.forEach(addCard);
+        if (overflow > 0) addSummaryCard(overflow);
       })
       .catch(function () {
         // Network error — silently ignore; will retry next interval
