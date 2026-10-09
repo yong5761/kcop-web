@@ -1,12 +1,10 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'kcop_fault_alerted';
-  var POLL_MS     = 30000;
-  var MAX_CARDS   = 15;
+  var POLL_MS   = 30000;
+  var MAX_CARDS = 15;
 
-  var baselineDone = false;
-  var openCards    = []; // DOM elements of currently visible cards
+  var openCards = []; // DOM elements of currently visible cards
 
   // ── CSS injection (runs once) ─────────────────────────────────────────────
   var styleEl = document.createElement('style');
@@ -51,21 +49,6 @@
     }
   }
 
-  // ── localStorage helpers ──────────────────────────────────────────────────
-  function loadAlerted() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    } catch (e) {
-      return [];
-    }
-  }
-
-  function saveAlerted(arr) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-    } catch (e) {}
-  }
-
   // ── Card stack ────────────────────────────────────────────────────────────
   function restack() {
     for (var i = 0; i < openCards.length; i++) {
@@ -75,8 +58,15 @@
     }
   }
 
-  function makeCloseHandler(cardEl) {
+  function makeCloseHandler(cardEl, phone) {
     return function () {
+      if (phone) {
+        fetch('/api/faults/ack', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone_no: phone })
+        }).catch(function () {});
+      }
       if (cardEl.parentNode) cardEl.parentNode.removeChild(cardEl);
       var idx = openCards.indexOf(cardEl);
       if (idx !== -1) openCards.splice(idx, 1);
@@ -95,19 +85,22 @@
       '</div>' +
       '<div class="kfc-body">' + bodyHtml + '</div>' +
       '<div class="kfc-foot"><button class="kfc-close">닫기</button></div>';
-    el.querySelector('.kfc-close').addEventListener('click', makeCloseHandler(el));
     return el;
   }
 
   function addCard(row) {
-    var bellName = (row.region || row.bell_name) ? esc(row.bell_name || '') : esc(String(row.phone_no || '-'));
+    var bellName = (row.region || row.bell_name)
+      ? esc(row.bell_name || '')
+      : esc(String(row.phone_no || '-'));
     var body =
-      (row.region  ? '<b>지역:</b> '    + esc(row.region)  + '<br>' : '') +
-      '<b>비상벨:</b> ' + bellName + '<br>' +
-      (row.address ? '<b>주소:</b> '    + esc(row.address) + '<br>' : '') +
+      (row.region  ? '<b>지역:</b> '     + esc(row.region)  + '<br>' : '') +
+      '<b>비상벨:</b> '  + bellName + '<br>' +
+      (row.address ? '<b>주소:</b> '     + esc(row.address) + '<br>' : '') +
       '<b>전화번호:</b> ' + esc(String(row.phone_no || '-')) + '<br>' +
       '<b>최종통신:</b> ' + esc(formatLastSeen(row.last_seen));
     var card = buildCard('장애발생', body);
+    card.dataset.phone = String(row.phone_no);
+    card.querySelector('.kfc-close').addEventListener('click', makeCloseHandler(card, row.phone_no));
     document.body.appendChild(card);
     openCards.push(card);
     restack();
@@ -117,6 +110,8 @@
   function addSummaryCard(n) {
     var body = '<b>외 ' + n + '건 통신장애</b>가 추가로 발생했습니다.';
     var card = buildCard('장애발생', body);
+    card.dataset.summary = '1';
+    card.querySelector('.kfc-close').addEventListener('click', makeCloseHandler(card, null));
     document.body.appendChild(card);
     openCards.push(card);
     restack();
@@ -125,44 +120,30 @@
 
   // ── Core poll logic ───────────────────────────────────────────────────────
   function poll() {
-    fetch('/api/bells')
+    fetch('/api/faults/pending')
       .then(function (res) { return res.json(); })
-      .then(function (data) {
-        if (!data.ok || !Array.isArray(data.rows)) return;
+      .then(function (j) {
+        if (!j.ok || !Array.isArray(j.rows)) return;
 
-        var faultRows = data.rows.filter(function (r) {
-          return r.comm_state === '통신장애';
-        });
-        var currentPhones = faultRows.map(function (r) { return String(r.phone_no); });
-
-        var alerted = loadAlerted();
-
-        if (!baselineDone) {
-          // First poll: establish baseline silently — no cards
-          baselineDone = true;
-          saveAlerted(currentPhones);
-          return;
-        }
-
-        var alertedSet = {};
-        alerted.forEach(function (p) { alertedSet[p] = true; });
-
-        var newlyFaulted = faultRows.filter(function (r) {
-          return !alertedSet[String(r.phone_no)];
+        // Build set of phone_no values already shown on screen
+        var shown = {};
+        openCards.forEach(function (c) {
+          if (c.dataset.phone) shown[c.dataset.phone] = true;
         });
 
-        // Keep only currently faulted phones; resolved ones drop out so
-        // they can re-trigger cards if the fault recurs.
-        saveAlerted(currentPhones);
-
-        if (newlyFaulted.length === 0) return;
+        var toAdd = j.rows.filter(function (r) {
+          return !shown[String(r.phone_no)];
+        });
 
         var room     = Math.max(0, MAX_CARDS - openCards.length);
-        var toShow   = newlyFaulted.slice(0, room);
-        var overflow = newlyFaulted.length - toShow.length;
+        var toShow   = toAdd.slice(0, room);
+        var overflow = toAdd.length - Math.min(toAdd.length, room);
 
         toShow.forEach(addCard);
-        if (overflow > 0) addSummaryCard(overflow);
+
+        // Add one summary card only if none is already visible
+        var hasSummary = openCards.some(function (c) { return c.dataset.summary === '1'; });
+        if (overflow > 0 && !hasSummary) addSummaryCard(overflow);
       })
       .catch(function () {
         // Network error — silently ignore; will retry next interval

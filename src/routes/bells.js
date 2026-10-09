@@ -370,4 +370,49 @@ router.get('/api/bells/low-firmware', async (req, res) => {
   }
 });
 
+router.get('/api/faults/pending', async (req, res) => {
+  try {
+    const { clause, params } = regionFilter(req.session.user, 'b');
+    const [rows] = await pool.execute(
+      `SELECT b.phone_no, b.bell_name, b.region, b.address, bl.last_seen
+       FROM bells b
+       LEFT JOIN bell_latest bl ON b.phone_no = bl.phone_no
+       LEFT JOIN bell_fault_ack a ON b.phone_no = a.phone_no
+       WHERE (bl.last_seen IS NULL OR bl.last_seen < (NOW() - INTERVAL 150 MINUTE))
+         AND (a.phone_no IS NULL OR NOT (a.acked_last_seen <=> bl.last_seen))
+         ${clause}
+       ORDER BY bl.last_seen ASC`,
+      params
+    );
+    res.json({ ok: true, rows });
+  } catch (e) {
+    console.error('[API] GET /api/faults/pending error:', e.message);
+    res.status(500).json({ ok: false, error: '서버 오류가 발생했습니다.' });
+  }
+});
+
+router.post('/api/faults/ack', async (req, res) => {
+  const { phone_no } = req.body || {};
+  if (phone_no == null || phone_no === '') {
+    return res.status(400).json({ ok: false, error: 'phone_no는 필수입니다.' });
+  }
+  try {
+    const [[latest]] = await pool.execute(
+      'SELECT last_seen FROM bell_latest WHERE phone_no = ?',
+      [phone_no]
+    );
+    const ls = latest ? latest.last_seen : null;
+    await pool.execute(
+      `INSERT INTO bell_fault_ack (phone_no, acked_last_seen)
+       VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE acked_last_seen = VALUES(acked_last_seen), acked_at = NOW()`,
+      [phone_no, ls]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[API] POST /api/faults/ack error:', e.message);
+    res.status(500).json({ ok: false, error: '서버 오류가 발생했습니다.' });
+  }
+});
+
 module.exports = router;
